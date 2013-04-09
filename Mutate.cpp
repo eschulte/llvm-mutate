@@ -160,16 +160,21 @@ bool Mutate::swapOp(GlobalValue *G){
     count = 0;
     for (Function::iterator BB = F->begin(), E = F->end(); BB != E; ++BB)
       for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I) {
+        // borrowing from IndVarSimplify.cpp
         count += 1;
         if(count == Stmt2){
-          // I->dropAllReferences();
-          I = temp1;
+          temp1->takeName(I);
+          temp1->insertBefore(I);
+          I->replaceAllUsesWith(temp1);
+          I->eraseFromParent();
           if(changed_p) return true;
           changed_p = true;
         }
         if(count == Stmt1){
-          // I->dropAllReferences();
-          I = temp2;
+          temp2->takeName(I);
+          temp2->insertBefore(I);
+          I->replaceAllUsesWith(temp2);
+          I->eraseFromParent();
           if(changed_p) return true;
           changed_p = true;
         }
