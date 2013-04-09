@@ -1,6 +1,6 @@
 Manipulate LLVM assembly
 
-This tool (should) performs the following operations
+This tool performs the following operations
 
       ids | prints the total number of statements
       cut | deletes that numbered statement
