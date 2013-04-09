@@ -16,7 +16,7 @@ Installation
 Examples
 
   First compile a source file to LLVM assembly.
-  
+
     $ echo 'main(){ puts("hello"); puts("goodbye");}' \
         |clang -x c - -S -emit-llvm -o greet.ll
 
@@ -30,14 +30,14 @@ Examples
 
   Count the statements in the original program.
 
-    $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so -mutate \
-        -mut-op=count greet.ll -o /dev/null
+    $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so \
+        -count greet.ll -o /dev/null
     3
 
   Cut the first statement from this program, compile and run.
 
-    $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so -mutate \
-        -mut-op=cut -stmt1=1 greet.ll -o cut.bl
+    $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so \
+        -cut -stmt1=1 greet.ll -o cut.bl
     cut 1
 
     $ cat cut.bl|llc|gcc -x assembler - -o cut
@@ -47,21 +47,21 @@ Examples
 
   Insert the second statement before the first.
 
-    $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so -mutate \
-      -mut-op=insert -stmt1=1 -stmt2=2 greet.ll -o insert.bl
+    $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so \
+      -insert -stmt1=1 -stmt2=2 greet.ll -o insert.bl
     inserted 2 before 1
 
     $ cat insert.bl|llc|gcc -x assembler - -o insert
 
     $ ./insert
-    goodbye                 
+    goodbye
     hello
     goodbye
 
   Swap the first two statements.
 
-    $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so -mutate \
-      -mut-op=swap -stmt1=1 -stmt2=2 greet.ll -o swap.bl
+    $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so \
+      -swap -stmt1=1 -stmt2=2 greet.ll -o swap.bl
     swapped 1 with 2
 
     $ cat swap.bl|llc|gcc -x assembler - -o swap
