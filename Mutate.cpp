@@ -49,7 +49,7 @@ bool Mutate::runOnModule(Module &M){
   } else if(! strcmp(Operation.c_str(), "insert")){
     // Insert Stmt1 before Stmt2 in the module
     for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I) insertOp(I);
-    if(changed_p) errs() << "inserted " << Stmt1 << " into " << Stmt2 << "\n";
+    if(changed_p) errs() << "inserted " << Stmt2 << " before " << Stmt1 << "\n";
     else          errs() << "insertion failed\n";
   } else if(! strcmp(Operation.c_str(), "swap")){
     // Swap Stmt1 with Stmt2 in the module
@@ -115,7 +115,7 @@ bool Mutate::insertOp(GlobalValue *G){
     for (Function::iterator BB = F->begin(), E = F->end(); BB != E; ++BB)
       for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I) {
         count += 1;
-        if(count == Stmt1){
+        if(count == Stmt2){
           temp1 = I->clone();
         }
       }
@@ -125,7 +125,7 @@ bool Mutate::insertOp(GlobalValue *G){
     for (Function::iterator BB = F->begin(), E = F->end(); BB != E; ++BB)
       for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I) {
         count += 1;
-        if(count == Stmt2){
+        if(count == Stmt1){
           temp1->insertBefore(I);
           changed_p = true;
           return true;
