@@ -1,0 +1,18 @@
+Manipulate LLVM assembly
+
+This tool (should) performs the following operations
+
+      ids | prints the total number of statements
+     list | list each statement with its ID
+   delete | deletes that numbered statement
+   insert | copies the second numbered statement before the first
+     swap | swaps the two numbered statements
+
+Installation
+
+Examples
+
+License
+
+  Licensed under the GPLV3, see the COPYING file in this directory for
+  more information.
