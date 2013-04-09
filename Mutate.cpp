@@ -8,6 +8,12 @@ using namespace llvm;
 static cl::opt<std::string>
 Operation("mut-op", cl::desc("Mutation operation to perform"));
 
+static cl::opt<unsigned>
+Stmt1("stmt1", cl::init(0), cl::desc("first statement to mutate"));
+
+static cl::opt<unsigned>
+Stmt2("stmt2", cl::init(0), cl::desc("second statement to mutate"));
+
 namespace {
   struct Mutate : public ModulePass {
     static char ID; // pass identification
@@ -17,30 +23,38 @@ namespace {
 
   private:
     int count;
-    void doFunction(GlobalValue *G);
+    void countOp(GlobalValue *G);
   };
 }
 
 bool Mutate::runOnModule(Module &M){
+  bool changed_p = false;
+
+  // Count up all operations in the module
+  for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I) countOp(I);
+
   if(! strcmp(Operation.c_str(), "count")){
-    errs() << "counting pass: ";
-
-    // Module Iterator
-    for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
-      doFunction(I);
-
-    errs() << count << '\n';
+    errs() << count << "\n";
+  } else if(! strcmp(Operation.c_str(), "cut")){
+    errs() << "cutting " << Stmt1 << "\n";
+  } else if(! strcmp(Operation.c_str(), "insert")){
+    errs() << "inserting " << Stmt1 << " into " << Stmt2 << "\n";
+  } else if(! strcmp(Operation.c_str(), "swap")){
+    errs() << "swapping " << Stmt1 << " with " << Stmt2 << "\n";
   } else {
-    errs() << "other pass\n";
+    errs() << "unknown mutation: '" << Operation << "'\n";
   }
-  return false; // true if modified by pass
+
+  return changed_p;
 }
 
-void Mutate::doFunction(GlobalValue *G){
+void Mutate::countOp(GlobalValue *G){
   if (dyn_cast<GlobalVariable>(G)){
+    // ignore global variables
   } else if (dyn_cast<GlobalAlias>(G)){
+    // ignore global alias
   } else {
-    // this must be a function object.
+    // descend into function objects
     Function *F = cast<Function>(G);
     
     for (Function::iterator BB = F->begin(), E = F->end(); BB != E; ++BB)
