@@ -1,8 +1,12 @@
 #include "llvm/Pass.h"
 #include "llvm/Module.h"
+#include "llvm/Support/CommandLine.h"
 #include "llvm/Support/raw_ostream.h"
 
 using namespace llvm;
+
+static cl::opt<std::string>
+Operation("mut-op", cl::desc("Mutation operation to perform"));
 
 namespace {
   struct Mutate : public ModulePass {
@@ -18,14 +22,17 @@ namespace {
 }
 
 bool Mutate::runOnModule(Module &M){
-  errs() << "running module pass: ";
+  if(! strcmp(Operation.c_str(), "count")){
+    errs() << "counting pass: ";
 
-  // Module Iterator
-  for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
-    doFunction(I);
+    // Module Iterator
+    for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
+      doFunction(I);
 
-  errs() << count << '\n';
-
+    errs() << count << '\n';
+  } else {
+    errs() << "other pass\n";
+  }
   return false; // true if modified by pass
 }
 
