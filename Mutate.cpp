@@ -23,13 +23,16 @@ namespace {
 
   private:
     unsigned int count;
+    bool changed_p;
     void countOp(GlobalValue *G);
     void cutOp(GlobalValue *G);
+    void insertOp(GlobalValue *G);
+    void swapOp(GlobalValue *G);
   };
 }
 
 bool Mutate::runOnModule(Module &M){
-  bool changed_p = false;
+  changed_p = false;
 
   if(! strcmp(Operation.c_str(), "count")){
     // Count up all operations in the module
@@ -38,11 +41,18 @@ bool Mutate::runOnModule(Module &M){
   } else if(! strcmp(Operation.c_str(), "cut")){
     // Cut Stmt1 from the module
     for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I) cutOp(I);
-    errs() << "cut " << Stmt1 << "\n";
+    if(changed_p) errs() << "cut " << Stmt1 << "\n";
+    else          errs() << "cut failed\n";
   } else if(! strcmp(Operation.c_str(), "insert")){
-    errs() << "inserting " << Stmt1 << " into " << Stmt2 << "\n";
+    // Insert Stmt1 before Stmt2 in the module
+    for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I) insertOp(I);
+    if(changed_p) errs() << "inserted " << Stmt1 << " into " << Stmt2 << "\n";
+    else          errs() << "insertion failed\n";
   } else if(! strcmp(Operation.c_str(), "swap")){
-    errs() << "swapping " << Stmt1 << " with " << Stmt2 << "\n";
+    // Swap Stmt1 with Stmt2 in the module
+    for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I) swapOp(I);
+    if(changed_p) errs() << "swapped " << Stmt1 << " with " << Stmt2 << "\n";
+    else          errs() << "swap failed\n";
   } else {
     errs() << "unknown mutation: '" << Operation << "'\n";
   }
@@ -58,7 +68,7 @@ void Mutate::countOp(GlobalValue *G){
   } else {
     // descend into function objects
     Function *F = cast<Function>(G);
-    
+
     for (Function::iterator BB = F->begin(), E = F->end(); BB != E; ++BB)
       for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I)
         count += 1;
@@ -78,11 +88,48 @@ void Mutate::cutOp(GlobalValue *G){
       for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I) {
         count += 1;
         if(count == Stmt1){
-          // alt. removeFromParent removes but doesn't destroy instruction
           I->eraseFromParent();
+          changed_p = true;
           return;
         }
       }
+  }
+}
+
+void Mutate::insertOp(GlobalValue *G){
+  errs() << "insert not implemented";
+}
+
+void Mutate::swapOp(GlobalValue *G){
+  if (dyn_cast<GlobalVariable>(G)){
+    // ignore global variables
+  } else if (dyn_cast<GlobalAlias>(G)){
+    // ignore global alias
+  } else {
+    // descend into function objects
+    Function *F = cast<Function>(G);
+
+    // collect the first instruction
+    BasicBlock::iterator temp;
+    for (Function::iterator BB = F->begin(), E = F->end(); BB != E; ++BB)
+      for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I) {
+        count += 1;
+        if(count == Stmt1){
+          temp = I;
+          break;
+        }
+      }
+
+    count = 0;
+    for (Function::iterator BB = F->begin(), E = F->end(); BB != E; ++BB)
+      for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I) {
+        count += 1;
+        if(count == Stmt2){
+          std::swap(temp,I);
+          changed_p = true;
+          return;
+        }
+      }    
   }
 }
 
