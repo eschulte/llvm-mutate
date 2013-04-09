@@ -86,7 +86,7 @@ bool Mutate::cutOp(GlobalValue *G){
   } else {
     // descend into function objects
     Function *F = cast<Function>(G);
-    
+
     for (Function::iterator BB = F->begin(), E = F->end(); BB != E; ++BB)
       for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I) {
         count += 1;
@@ -101,7 +101,37 @@ bool Mutate::cutOp(GlobalValue *G){
 }
 
 bool Mutate::insertOp(GlobalValue *G){
-  errs() << "insert not implemented";
+  if (dyn_cast<GlobalVariable>(G)){
+    // ignore global variables
+  } else if (dyn_cast<GlobalAlias>(G)){
+    // ignore global alias
+  } else {
+    // descend into function objects
+    Function *F = cast<Function>(G);
+
+    // collect the instruction
+    BasicBlock::iterator temp1;
+    for (Function::iterator BB = F->begin(), E = F->end(); BB != E; ++BB)
+      for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I) {
+        count += 1;
+        if(count == Stmt1){
+          temp1 = I->clone();
+        }
+      }
+
+    // set the instructions
+    count = 0;
+    for (Function::iterator BB = F->begin(), E = F->end(); BB != E; ++BB)
+      for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I) {
+        count += 1;
+        if(count == Stmt2){
+          // I->dropAllReferences();
+          I = temp1;
+          if(changed_p) return true;
+          changed_p = true;
+        }
+      }
+  }
   return false;
 }
 
@@ -144,7 +174,7 @@ bool Mutate::swapOp(GlobalValue *G){
           if(changed_p) return true;
           changed_p = true;
         }
-      }    
+      }
   }
   return false;
 }

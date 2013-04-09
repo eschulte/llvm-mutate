@@ -1,0 +1,9 @@
+Notes                                                      -*- org -*-
+
+* Tasks [0/1]
+** TODO swap is causing problems
+- generating def-use errors
+- removing refs just throws unspecific errors
+- see last answer to [[http://stackoverflow.com/questions/7671421/delete-loop-by-erasefromparent-command-in-llvm][delete loop by erasefromparent command in llvm]], I
+  may need to loop over all users of each instruction, and update
+  their references to the other instruction
