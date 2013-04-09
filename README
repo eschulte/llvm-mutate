@@ -2,7 +2,7 @@ Manipulate LLVM assembly
 
 This tool performs the following operations
 
-      ids | prints the total number of statements
+    count | prints the total number of statements
       cut | deletes that numbered statement
    insert | copies the second numbered statement before the first
      swap | swaps the two numbered statements
@@ -11,7 +11,7 @@ Installation
 
   Copy this directory to llvm/lib/Transforms/Mutate in your llvm
   source tree, then run make from within the Mutate directory.  See
-  http://llvm.org/docs/WritingAnLLVMPass.html
+  http://llvm.org/docs/WritingAnLLVMPass.html for more information.
 
 Examples
 
