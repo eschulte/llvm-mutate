@@ -3,6 +3,7 @@
 #include "llvm/Module.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/InstIterator.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 
 using namespace llvm;
@@ -35,9 +36,8 @@ namespace {
   private:
     int unsigned count;
     void walkFunction(Function *F){
-      for (Function::iterator B = F->begin(), E = F->end(); B != E; ++B) {
-        for (BasicBlock::iterator I = B->begin(), E = B->end(); I != E; ++I) {
-          count += 1; } } }
+      for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I)
+        count += 1; }
   };
 }
 
@@ -61,13 +61,15 @@ namespace {
     int unsigned count;
     bool changed_p;
     bool walkFunction(Function *F){
-      for (Function::iterator B = F->begin(), E = F->end(); B != E; ++B) {
-        for (BasicBlock::iterator I = B->begin(), E = B->end(); I != E; ++I) {
-          count += 1;
-          if(count == Stmt1){
-            I->eraseFromParent();
-            changed_p = true;
-            return true; } } }
+      for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
+        count += 1;
+        if(count == Stmt1){
+          // If this is a terminator instruction we might have problems.
+          // if(!isa<TerminatorInst>(I))
+          //   errs() << "Caution deleting terminator instruction\n";
+          I->eraseFromParent();
+          changed_p = true;
+          return true; } }
       return false; }
   };
 }
@@ -97,22 +99,30 @@ namespace {
     BasicBlock::iterator temp;
 
     bool walkCollect(Function *F){
-      for (Function::iterator B = F->begin(), E = F->end(); B != E; ++B) {
-        for (BasicBlock::iterator I = B->begin(), E = B->end(); I != E; ++I) {
-          count += 1;
-          if(count == Stmt2) {
-            temp = I->clone();
-            return true; } } }
+      for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
+        count += 1;
+        if(count == Stmt2) {
+          temp = I->clone();
+          temp->setName(I->getName());
+          return true; } }
       return false; }
 
     bool walkPlace(Function *F){
       for (Function::iterator B = F->begin(), E = F->end(); B != E; ++B) {
         for (BasicBlock::iterator I = B->begin(), E = B->end(); I != E; ++I) {
-          count += 1;
-          if(count == Stmt1){
-            temp->insertBefore(I);
-            changed_p = true;
-            return true; } } }
+        count += 1;
+        if(count == Stmt1){
+          // TODO: need to populate any arguments to temp from the
+          //       available context, of possible use are
+          //   temp->getOperand(0)
+          //   temp->setName();
+          //
+          // TODO: remap instruction operands
+          // // Eagerly remap the operands of the instruction.
+          // RemapInstruction(C, ValueMap, RF_NoModuleLevelChanges|RF_IgnoreMissingEntries);
+          temp->insertBefore(I);
+          changed_p = true;
+          return true; } } }
       return false; }
   };
 }
@@ -143,11 +153,10 @@ namespace {
     BasicBlock::iterator temp1, temp2;
 
     void walkCollect(Function *F){
-      for (Function::iterator B = F->begin(), E = F->end(); B != E; ++B) {
-        for (BasicBlock::iterator I = B->begin(), E = B->end(); I != E; ++I) {
-          count += 1;
-          if (count == Stmt1) temp1 = I->clone();
-          if (count == Stmt2) temp2 = I->clone(); } } }
+      for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
+        count += 1;
+        if (count == Stmt1) temp1 = I->clone();
+        if (count == Stmt2) temp2 = I->clone(); } }
 
     bool walkPlace(Function *F){
       for (Function::iterator B = F->begin(), E = F->end(); B != E; ++B) {
