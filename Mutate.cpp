@@ -103,7 +103,7 @@ namespace {
         count += 1;
         if(count == Stmt2) {
           temp = I->clone();
-          temp->setName(I->getName());
+          temp->setName(I->getName()+".insert");
           return true; } }
       return false; }
 
@@ -155,8 +155,12 @@ namespace {
     void walkCollect(Function *F){
       for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
         count += 1;
-        if (count == Stmt1) temp1 = I->clone();
-        if (count == Stmt2) temp2 = I->clone(); } }
+        if (count == Stmt1) {
+          temp1 = I->clone();
+          temp1->setName(I->getName()+".swap1"); }
+        if (count == Stmt2) {
+          temp2 = I->clone();
+          temp2->setName(I->getName()+".swap2"); } } }
 
     bool walkPlace(Function *F){
       for (Function::iterator B = F->begin(), E = F->end(); B != E; ++B) {
