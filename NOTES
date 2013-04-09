@@ -42,3 +42,8 @@ we only really need to
 
 - when replacing it could be nice to do this
   : PN->replaceAllUsesWith(Conv);
+
+* Notes
+** use-def and def-use
+file:../../../docs/ProgrammersManual.html
+see Iterating over def-use & use-def chains
