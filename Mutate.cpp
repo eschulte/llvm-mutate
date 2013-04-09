@@ -22,21 +22,23 @@ namespace {
     bool runOnModule(Module &M);
 
   private:
-    int count;
+    unsigned int count;
     void countOp(GlobalValue *G);
+    void cutOp(GlobalValue *G);
   };
 }
 
 bool Mutate::runOnModule(Module &M){
   bool changed_p = false;
 
-  // Count up all operations in the module
-  for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I) countOp(I);
-
   if(! strcmp(Operation.c_str(), "count")){
+    // Count up all operations in the module
+    for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I) countOp(I);
     errs() << count << "\n";
   } else if(! strcmp(Operation.c_str(), "cut")){
-    errs() << "cutting " << Stmt1 << "\n";
+    // Cut Stmt1 from the module
+    for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I) cutOp(I);
+    errs() << "cut " << Stmt1 << "\n";
   } else if(! strcmp(Operation.c_str(), "insert")){
     errs() << "inserting " << Stmt1 << " into " << Stmt2 << "\n";
   } else if(! strcmp(Operation.c_str(), "swap")){
@@ -59,8 +61,28 @@ void Mutate::countOp(GlobalValue *G){
     
     for (Function::iterator BB = F->begin(), E = F->end(); BB != E; ++BB)
       for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I)
-        for (User::op_iterator U = I->op_begin(), E = I->op_end(); U != E; ++U)
-          count += 1;
+        count += 1;
+  }
+}
+
+void Mutate::cutOp(GlobalValue *G){
+  if (dyn_cast<GlobalVariable>(G)){
+    // ignore global variables
+  } else if (dyn_cast<GlobalAlias>(G)){
+    // ignore global alias
+  } else {
+    // descend into function objects
+    Function *F = cast<Function>(G);
+    
+    for (Function::iterator BB = F->begin(), E = F->end(); BB != E; ++BB)
+      for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I) {
+        count += 1;
+        if(count == Stmt1){
+          // alt. removeFromParent removes but doesn't destroy instruction
+          I->eraseFromParent();
+          return;
+        }
+      }
   }
 }
 
