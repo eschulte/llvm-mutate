@@ -110,19 +110,19 @@ namespace {
     bool walkPlace(Function *F){
       for (Function::iterator B = F->begin(), E = F->end(); B != E; ++B) {
         for (BasicBlock::iterator I = B->begin(), E = B->end(); I != E; ++I) {
-        count += 1;
-        if(count == Stmt1){
-          // TODO: need to populate any arguments to temp from the
-          //       available context, of possible use are
-          //   temp->getOperand(0)
-          //   temp->setName();
-          //
-          // TODO: remap instruction operands
-          // // Eagerly remap the operands of the instruction.
-          // RemapInstruction(C, ValueMap, RF_NoModuleLevelChanges|RF_IgnoreMissingEntries);
-          temp->insertBefore(I);
-          changed_p = true;
-          return true; } } }
+          count += 1;
+          if(count == Stmt1){
+            // TODO: need to populate any arguments to temp from the
+            //       available context, of possible use are
+            //   temp->getOperand(0)
+            //   temp->setName();
+            //
+            // TODO: remap instruction operands
+            // // Eagerly remap the operands of the instruction.
+            // RemapInstruction(C, ValueMap, RF_NoModuleLevelChanges|RF_IgnoreMissingEntries);
+            temp->insertBefore(I);
+            changed_p = true;
+            return true; } } }
       return false; }
   };
 }
