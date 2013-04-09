@@ -125,10 +125,9 @@ bool Mutate::insertOp(GlobalValue *G){
       for (BasicBlock::iterator I = BB->begin(), E = BB->end(); I != E; ++I) {
         count += 1;
         if(count == Stmt2){
-          // I->dropAllReferences();
-          I = temp1;
-          if(changed_p) return true;
+          temp1->insertBefore(I);
           changed_p = true;
+          return true;
         }
       }
   }
