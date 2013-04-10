@@ -128,8 +128,10 @@ namespace {
     void walkFunction(Function *F){
       for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
         count += 1;
-        errs() << count << "\t" << I->getType() << "\t" << I->getName() << "\n";
-      } }
+        errs() << count << "\t" << I->getType();
+        for (User::op_iterator i = I->op_begin(), e = I->op_end(); i != e; ++i)
+          errs() << "\t" << cast<Value>(i)->getType();
+        errs() << "\n"; } }
   };
 }
 
