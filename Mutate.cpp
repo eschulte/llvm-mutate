@@ -138,7 +138,17 @@ namespace {
       changed_p = false;
       for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
         walkCollect(I);
+      
       count = 0;
+      // confirm that the types match
+      if(temp1->getType() != temp2->getType()){
+        errs() << "type mismatch " <<
+          temp1->getType() << " and " <<
+          temp2->getType() << "\n";
+        delete(temp1);
+        delete(temp2);
+        return changed_p; }
+
       for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
         if(walkPlace(I)) break;
 
@@ -157,10 +167,12 @@ namespace {
         count += 1;
         if (count == Stmt1) {
           temp1 = I->clone();
-          temp1->setName(I->getName()+".swap1"); }
+          if (!temp1->getType()->isVoidTy()) {
+            temp1->setName(I->getName()+".swap1"); } }
         if (count == Stmt2) {
           temp2 = I->clone();
-          temp2->setName(I->getName()+".swap2"); } } }
+          if (!temp2->getType()->isVoidTy()){
+            temp2->setName(I->getName()+".swap2"); } } } }
 
     bool walkPlace(Function *F){
       for (Function::iterator B = F->begin(), E = F->end(); B != E; ++B) {
@@ -169,8 +181,7 @@ namespace {
           if(count == Stmt2){
             ReplaceInstWithInst(I->getParent()->getInstList(), I, temp1);
             if(changed_p) return true;
-            changed_p = true;
-          }
+            changed_p = true; }
           if(count == Stmt1){
             ReplaceInstWithInst(I->getParent()->getInstList(), I, temp2);
             if(changed_p) return true;
