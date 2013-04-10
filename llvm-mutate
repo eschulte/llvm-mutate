@@ -23,8 +23,14 @@ HELP_TEXT=$(cat "$0" \
 if echo "$1"|grep -q "\-h";then
     echo "$HELP_TEXT"; exit 1;
 fi
-LEVEL="../../.."
-OPT_FLAGS="-load ${LEVEL}/Debug+Asserts/lib/Mutate.so -f"
+if [ -z "$LLVM" ];then
+    if [ -d "Debug+Asserts" ];then # prob. in the source directory
+        LLVM="../../../Debug+Asserts"
+    else # use opt to find it
+        LLVM="$(dirname $(which opt))/.."
+    fi
+fi
+OPT_FLAGS="-load ${LLVM}/lib/Mutate.so -f"
 LINK=""
 OUT=""
 RAW=$(cat -)
