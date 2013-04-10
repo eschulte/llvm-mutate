@@ -1,17 +1,18 @@
 #!/bin/bash
 #
-# llvm-mutate -[n|l] -[c|i|s instructions] -l -[o path]
+# llvm-mutate -[n|l|g|G] -[c|i|s instructions] -l -[o path]
 #  mutate llvm assembly code
 #
 # Options
-#  -C,--count ----- print the number of instructions
-#  -L,--list ------ list instructions with number and types
-#  -g,--graph ----- show the call graph
-#  -c,--cut ------- cut the given instruction
-#  -i,--insert ---- copy the second inst. before the first
-#  -s,--swap ------ swap the given instructions
-#  -l,--link ------ link the result into an executable
-#  -o,--out ------- write output to specified file
+#  -C,--count ------ print the number of instructions
+#  -L,--list ------- list instructions with number and types
+#  -g,--cfg -------- show the CFG graph
+#  -G,--call-graph - show the call graph
+#  -c,--cut -------- cut the given instruction
+#  -i,--insert ----- copy the second inst. before the first
+#  -s,--swap ------- swap the given instructions
+#  -l,--link ------- link the result into an executable
+#  -o,--out -------- write output to specified file
 #
 HELP_TEXT=$(cat "$0" \
     |sed '/^[^#]/q' \
@@ -19,6 +20,9 @@ HELP_TEXT=$(cat "$0" \
     |tail -n +3 \
     |sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' \
     |cut -c3-)
+if echo "$1"|grep -q "\-h";then
+    echo "$HELP_TEXT"; exit 1;
+fi
 LEVEL="../../.."
 OPT_FLAGS="-load ${LEVEL}/Debug+Asserts/lib/Mutate.so -f"
 LINK=""
@@ -29,9 +33,9 @@ run(){ RAW="$(echo "$RAW"|opt ${OPT_FLAGS} $@|llvm-dis)"; }
 
 ## Process Options
 eval set -- $(getopt \
-    -o hCLgc:i:s:lo:f: \
-    -l help,count,graph,list,cut:,insert:,swap:,link,out:,file: -- "$@" \
-    || echo "$HELP_TEXT" && exit 1;)
+    -o hCLgGc:i:s:lo:f: \
+    -l help,count,cfg,call-graph,list,cut:,insert:,swap:,link,out:,file: \
+    -- "$@" || echo "$HELP_TEXT" && exit 1;)
 while [ $# -gt 0 ];do
     case $1 in
         -h|--help) echo "$HELP_TEXT" && exit 1;;
@@ -40,8 +44,15 @@ while [ $# -gt 0 ];do
         -f|--file) FILE="$2"; shift;;
         -C|--count) run -count ;;
         -L|--list)  run -list ;;
-        -g|--graph)
+        -g|--cfg)
             for graph in $(run -dot-cfg 3>&1 >/dev/null 2>&3 \
+                |sed "s/Writing '//;s/'...//");do
+                cat $graph|dot -Tpng|feh -
+                rm -f $graph
+            done
+            ;;
+        -G|--call-graph)
+            for graph in $(run -dot-callgraph 3>&1 >/dev/null 2>&3 \
                 |sed "s/Writing '//;s/'...//");do
                 cat $graph|dot -Tpng|feh -
                 rm -f $graph
