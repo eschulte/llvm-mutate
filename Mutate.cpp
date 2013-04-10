@@ -91,8 +91,8 @@ namespace {
       for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
         count += 1;
         if(count == Inst1){
-          if(!I->use_empty()){
-            errs()<<"TODO: clean up dangling uses after cut\n"; }
+          I->replaceAllUsesWith(Constant::getNullValue(I->getType()));
+          if(!I->use_empty()){errs()<<"dangling uses after cut\n"; }
           I->eraseFromParent();
           changed_p = true;
           return true; } }
