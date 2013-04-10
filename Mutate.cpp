@@ -15,6 +15,23 @@ Inst1("inst1", cl::init(0), cl::desc("first statement to mutate"));
 static cl::opt<unsigned>
 Inst2("inst2", cl::init(0), cl::desc("second statement to mutate"));
 
+// Use the result of instruction I somewhere in the basic block in
+// which it is defined.  Ideally in the immediately subsequent
+// instruction.
+void useResult(Instruction *I){
+  // we don't care if already used, use it again!
+  // if(!I->use_empty()){ errs()<<"already used!\n" };
+  BasicBlock *B = I->getParent();
+  BasicBlock::iterator Begin = I; ++Begin;
+  for (BasicBlock::iterator i = Begin, E = B->end(); i != E; ++i){
+    for (User::op_iterator i = I->op_begin(), e = I->op_end(); i != e; ++i){
+      Value *v = *i;
+      if (v->getType() == I->getType()){
+        v = I;
+        return; } } }
+  errs()<<"could find no use for result\n";
+}
+
 // Find a value of Type T which can be used at Instruction I.  Search
 // in this order.
 // 1. values in Basic Block before I
@@ -23,12 +40,14 @@ Inst2("inst2", cl::init(0), cl::desc("second statement to mutate"));
 // 4. null of the correct type
 // 5. return a 0 that the caller can stick where the sun don't shine
 Value *findInstanceOfType(Instruction *I, Type *T){
+
   // local inside the Basic Block
   BasicBlock *B = I->getParent();
   for (BasicBlock::iterator prev = B->begin(); cast<Value>(prev) != I; ++prev){
     if(prev->getType() == T){
       errs()<<"found local replacement: "<<prev<<"\n";
       return cast<Value>(prev); } }
+
   // arguments to the function
   Function *F = B->getParent();
   for (Function::arg_iterator arg = F->arg_begin(), E = F->arg_end();
@@ -36,6 +55,7 @@ Value *findInstanceOfType(Instruction *I, Type *T){
     if(arg->getType() == T){
       errs()<<"found arg replacement: "<<arg<<"\n";
       return cast<Value>(arg); } }
+
   // global values
   Module *M = F->getParent();
   for (Module::global_iterator g = M->global_begin(), E = M->global_end();
@@ -43,19 +63,19 @@ Value *findInstanceOfType(Instruction *I, Type *T){
     if(g->getType() == T){
       errs()<<"found global replacement: "<<g<<"\n";
       return cast<Value>(g); } }
+
   // null
   if(!isa<FunctionType>(T)){
     return Constant::getNullValue(T);
   }
+
+  // give up
   errs()<<"findInstanceOfType failed to find anything, you're screwed\n";
   return 0;
 }
 
 // Replace the operands of Instruction I with in-scope values of the
-// same type.
-//
-// NOTE: this might be relevant
-//   RemapInstruction(C, ValueMap, RF_NoModuleLevelChanges);
+// same type.  If the operands are already in scope, then retain them.
 void replaceOperands(Instruction *I){
   // loop through operands,
   for (User::op_iterator i = I->op_begin(), e = I->op_end(); i != e; ++i) {
@@ -164,7 +184,6 @@ namespace {
         if(count == Inst1){
           Instruction *Inst = &*I;
           I->replaceAllUsesWith(findInstanceOfType(Inst,I->getType()));
-          if(!I->use_empty()){errs()<<"dangling uses after cut\n"; }
           I->eraseFromParent();
           changed_p = true;
           return true; } }
@@ -194,6 +213,7 @@ namespace {
 
   private:
     int unsigned count;
+    bool result_ignorable_p;
     bool changed_p;
     BasicBlock::iterator temp;
 
@@ -201,6 +221,10 @@ namespace {
       for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
         count += 1;
         if(count == Inst2) {
+          // check if I generates a result which is used, if not then
+          // it is probably run for side effects and we don't need to
+          // wire the result of the copy of I to something later on
+          result_ignorable_p = I->use_empty();
           temp = I->clone();
           if (!temp->getType()->isVoidTy())
             temp->setName(I->getName()+".insert");
@@ -214,16 +238,11 @@ namespace {
           if(count == Inst1){
             temp->insertBefore(I); // insert temp before I
             replaceOperands(temp); // wire incoming edges of CFG into temp
-            useResult(I);          // wire outgoing results of temp into CFG
+            if(!result_ignorable_p)
+              useResult(temp); // wire outgoing results of temp into CFG
             changed_p = true;
             return true; } } }
       return false; }
-
-    // Use the result of Instruction I later in the Function in which it
-    // is inserted.
-    void useResult(Instruction *I){
-
-    }
   };
 }
 

@@ -1,5 +1,5 @@
                                                            -*- org -*-
-* Tasks [0/2]
+* Tasks [1/2]
 ** cut must correctly handle deletion of final instruction in block
 do this by folding it into its successor
 : /// FoldBlockIntoPredecessor - Folds a basic block into its predecessor if it
@@ -34,7 +34,7 @@ do this by folding it into its successor
           Succ->eraseFromParent(); } } } }
 #+end_src
 
-** TODO populated inserted instruction arguments from scope
+** DONE populated inserted instruction arguments from scope
 When inserting an instruction we need to do two things.
 
 1. find arguments from the current scope, =replaceOperands=.
