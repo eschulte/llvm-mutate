@@ -86,8 +86,10 @@ void replaceOperands(Instruction *I){
     counter++;
     Value *v = *i;
 
-    // don't touch global or constant values
-    if (!isa<GlobalValue>(v) && !isa<Constant>(v)){
+    // don't touch globals, constants or labels
+    if (!isa<GlobalValue>(v) &&
+        !isa<Constant>(v) &&
+        v->getType()->isLabelTy()){
 
       // don't touch arguments to the current function
       Function *F = I->getParent()->getParent();
