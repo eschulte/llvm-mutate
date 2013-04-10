@@ -38,7 +38,7 @@ Examples
   Cut the first statement from this program, compile and run.
 
     $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so \
-        -cut -stmt1=1 greet.ll -o cut.bl
+        -cut -inst1=1 greet.ll -o cut.bl
     cut 1
 
     $ cat cut.bl|llc|gcc -x assembler - -o cut
@@ -49,7 +49,7 @@ Examples
   Insert the second statement before the first.
 
     $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so \
-      -insert -stmt1=1 -stmt2=2 greet.ll -o insert.bl
+      -insert -inst1=1 -inst2=2 greet.ll -o insert.bl
     inserted 2 before 1
 
     $ cat insert.bl|llc|gcc -x assembler - -o insert
@@ -62,7 +62,7 @@ Examples
   Swap the first two statements.
 
     $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so \
-      -swap -stmt1=1 -stmt2=2 greet.ll -o swap.bl
+      -swap -inst1=1 -inst2=2 greet.ll -o swap.bl
     swapped 1 with 2
 
     $ cat swap.bl|llc|gcc -x assembler - -o swap

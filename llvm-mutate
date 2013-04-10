@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# llvm-mutate MUT-OP [OPTIONS] [INFILE] [OUTFILE]
+#  mutate llvm assembly code
+#
+# Options
+#  -1,--inst1 ----- the first instruction ID to mutate
+#  -2,--inst2 ----- the second instruction ID to mutate
+#
+HELP_TEXT=$(cat "$0" \
+    |sed '/^[^#]/q' \
+    |head -n -1 \
+    |tail -n +3 \
+    |sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' \
+    |cut -c3-)
+LEVEL="../../.."
+OPT_FLAGS="-load ${LEVEL}/Debug+Asserts/lib/Mutate.so -f"
+OP="$1";shift;
+
+## Options
+eval set -- $(getopt -o h1:2: -l help,inst1:,inst2: -- "$@" \
+    || echo "$HELP_TEXT" && exit 1;)
+while [ $# -gt 0 ];do
+    case $1 in
+        -h|--help)  echo "$HELP_TEXT" && exit 1;;
+        -1|--inst1) OPT_FLAGS+=" -inst1=$2"; shift;;
+        -2|--inst2) OPT_FLAGS+=" -inst2=$2"; shift;;
+        (--) shift; break;;
+        (-*) error "unrecognized option $1";;
+        (*)  break;;
+    esac
+    shift
+done
+
+# for now assuming STDIN/STDOUT
+opt ${OPT_FLAGS} -$OP $1|llvm-dis

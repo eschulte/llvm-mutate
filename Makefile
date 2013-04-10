@@ -35,13 +35,13 @@ test/arith-list: test/arith.ll
 	opt $(OPT_FLAGS) -list $< -o /dev/null
 
 test/arith-cut.bl: test/arith.ll
-	opt $(OPT_FLAGS) -cut -stmt1=4 $< -o $@
+	opt $(OPT_FLAGS) -cut -inst1=4 $< -o $@
 
 test/arith-ins.bl: test/arith.ll
-	opt $(OPT_FLAGS) -insert -stmt1=5 -stmt2=7 $< -o $@
+	opt $(OPT_FLAGS) -insert -inst1=5 -inst2=7 $< -o $@
 
 test/arith-swp.bl: test/arith.ll
-	opt $(OPT_FLAGS) -swap -stmt1=6 -stmt2=7 $< -o $@
+	opt $(OPT_FLAGS) -swap -inst1=6 -inst2=7 $< -o $@
 
 test/greet-count: test/greet.ll
 	opt $(OPT_FLAGS) -count $< -o /dev/null
@@ -50,10 +50,10 @@ test/greet-list: test/greet.ll
 	opt $(OPT_FLAGS) -list $< -o /dev/null
 
 test/greet-cut.bl: test/greet.ll
-	opt $(OPT_FLAGS) -cut -stmt1=1 $< -o $@
+	opt $(OPT_FLAGS) -cut -inst1=1 $< -o $@
 
 test/greet-ins.bl: test/greet.ll
-	opt $(OPT_FLAGS) -insert -stmt1=1 -stmt2=2 $< -o $@
+	opt $(OPT_FLAGS) -insert -inst1=1 -inst2=2 $< -o $@
 
 real-clean:
 	rm -rf test/*
