@@ -1,4 +1,3 @@
-// -*- tags-file-name:"../../../tags" -*-
 // Copyright (C) 2013 Eric Schulte
 #include "llvm/Pass.h"
 #include "llvm/Module.h"
