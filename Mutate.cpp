@@ -158,8 +158,8 @@ namespace {
       for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
         count += 1;
         if(count == Inst1){
-          // TODO: instead of replacing with null, replace with nearby value
-          I->replaceAllUsesWith(Constant::getNullValue(I->getType()));
+          Instruction *Inst = &*I;
+          I->replaceAllUsesWith(findInstanceOfType(Inst,I->getType()));
           if(!I->use_empty()){errs()<<"dangling uses after cut\n"; }
           I->eraseFromParent();
           changed_p = true;
