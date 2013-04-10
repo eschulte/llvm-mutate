@@ -6,6 +6,7 @@
 # Options
 #  -C,--count ----- print the number of instructions
 #  -L,--list ------ list instructions with number and types
+#  -g,--graph ----- show the call graph
 #  -c,--cut ------- cut the given instruction
 #  -i,--insert ---- copy the second inst. before the first
 #  -s,--swap ------ swap the given instructions
@@ -28,8 +29,8 @@ run(){ RAW="$(echo "$RAW"|opt ${OPT_FLAGS} $@|llvm-dis)"; }
 
 ## Process Options
 eval set -- $(getopt \
-    -o hCLc:i:s:lo:f: \
-    -l help,count,list,cut:,insert:,swap:,link,out:,file: -- "$@" \
+    -o hCLgc:i:s:lo:f: \
+    -l help,count,graph,list,cut:,insert:,swap:,link,out:,file: -- "$@" \
     || echo "$HELP_TEXT" && exit 1;)
 while [ $# -gt 0 ];do
     case $1 in
@@ -38,8 +39,15 @@ while [ $# -gt 0 ];do
         -o|--out)  OUT="$2"; shift;;
         -f|--file) FILE="$2"; shift;;
         -C|--count) run -count ;;
-        -L|--list) run -list ;;
-        -c|--cut) run -cut -inst1="$2"; shift;;
+        -L|--list)  run -list ;;
+        -g|--graph)
+            for graph in $(run -dot-cfg 3>&1 >/dev/null 2>&3 \
+                |sed "s/Writing '//;s/'...//");do
+                cat $graph|dot -Tpng|feh -
+                rm -f $graph
+            done
+            ;;
+        -c|--cut)   run -cut -inst1="$2"; shift;;
         -i|--insert)
             run -insert \
                 -inst1="$(echo $2|cut -d, -f1)" \
