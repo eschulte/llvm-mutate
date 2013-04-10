@@ -90,7 +90,9 @@ namespace {
     bool walkFunction(Function *F){
       for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
         count += 1;
-        if(count == Stmt1){
+        if(count == Inst1){
+          if(!I->use_empty()){
+            errs()<<"TODO: clean up dangling uses after cut\n"; }
           I->eraseFromParent();
           changed_p = true;
           return true; } }
