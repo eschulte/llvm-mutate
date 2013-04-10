@@ -188,8 +188,11 @@ namespace {
       for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
         count += 1;
         if(count == Inst1){
+          // TODO: once more thinking it would be good to glue basic
+          //       blocks when we delete a terminating instruction
           Instruction *Inst = &*I;
-          I->replaceAllUsesWith(findInstanceOfType(Inst,I->getType()));
+          if(!I->use_empty())
+            I->replaceAllUsesWith(findInstanceOfType(Inst,I->getType()));
           I->eraseFromParent();
           changed_p = true;
           return true; } }
