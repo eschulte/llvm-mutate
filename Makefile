@@ -52,5 +52,8 @@ test/greet-list: test/greet.ll
 test/greet-cut.bl: test/greet.ll
 	opt $(OPT_FLAGS) -cut -stmt1=1 $< -o $@
 
+test/greet-ins.bl: test/greet.ll
+	opt $(OPT_FLAGS) -insert -stmt1=1 -stmt2=2 $< -o $@
+
 real-clean:
 	rm -rf test/*

@@ -143,7 +143,8 @@ namespace {
         count += 1;
         if(count == Stmt2) {
           temp = I->clone();
-          temp->setName(I->getName()+".insert");
+          if (!temp->getType()->isVoidTy())
+            temp->setName(I->getName()+".insert");
           return true; } }
       return false; }
 
