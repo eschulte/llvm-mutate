@@ -21,7 +21,7 @@ greet.ll:
 	echo 'main(){ puts("hello"); puts("goodbye"); }'|$(LLVMC) -o $@
 
 arith.ll:
-	echo 'main(){ int x=2; x+=10; x=x*x; return x;}'|$(LLVMC) -o $@
+	echo 'main(){ int x=2; x+=3; x=x*x; printf("%d\n", x);}'|$(LLVMC) -o $@
 
-real-clean:
-	rm -f a.out *.ll *.bl
+real-clean: clean
+	@ rm -f a.out *.ll *.bl

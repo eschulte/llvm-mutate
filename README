@@ -61,6 +61,104 @@ Examples
     goodbye
     hello
 
+  We can also look at a slightly more complicated file which actually
+  has some data dependencies between instructions.  Dependencies which
+  the mutation tool will need to address.
+
+    $ make arith.ll
+
+    $ cat arith.ll|./llvm-mutate -l
+
+    $ ./a.out
+    25
+
+  Here mutations will change the data dependencies between the
+  instructions, and effect the value of "x" which is printed at the
+  end.
+
+    $ cat arith.ll|./llvm-mutate -c 4 -l
+    found local replacement: 0x2ac0aa8
+    cut 4
+
+    $ ./a.out
+    4
+
+    $ cat arith.ll|./llvm-mutate -c 3 -l
+    cut 3
+
+    $ ./a.out
+    9
+
+    $ cat arith.ll|./llvm-mutate -c 6 -l
+    found local replacement: 0x39aaaa8
+    cut 6
+
+    $ ./a.out
+    10
+
+  The compiler pass attempts to "plug" new instructions into the call
+  graph near where they are inserted, satisfying their arguments with
+  in-scope variables and plugging their output into the arguments of
+  subsequent variables.
+
+    $ cat arith.ll|./llvm-mutate -i 6,9 -l
+    replacing argument: 0x2f6ce50
+    found local replacement: 0x2f6cae8
+    inserted 9 before 6
+
+    $ ./a.out
+    4
+
+  When this isn't possible, a warning is printed and the insertion
+  likely has no effect.
+
+    $ cat arith.ll|./llvm-mutate -i 4,10 -l
+    could find no use for result
+    inserted 10 before 4
+
+    $ ./a.out
+    25
+
+  Unless of course the inserted instruction acts through side effects.
+  For example this copies the printf instruction into the middle of
+  the function.
+
+    $ cat arith.ll|./llvm-mutate -i 4,11 -l
+    replacing argument: 0x1e34f88
+    found local replacement: 0x1e34ae8
+    inserted 11 before 4
+
+    $ ./a.out
+    2
+    25
+
+  See the output of "./llvm-mutate --help" for more actions which may
+  be performed on compiled llvm IR.  If multiple options are given to
+  llvm-mutate they will be applied in series to the code.  So for
+  example the following command line will,
+
+  1. print a count of instructions,
+  2. display the program call graph (w/the dot and feh programs),
+  3. cut an instruction,
+  4. print another count,
+  5. inserts an instruction,
+  6. prints a third instruction count,
+  7. display the new call graph
+  8. and finally link the resulting LLVM IR into an executable.
+
+    $ cat arith.ll|./llvm-mutate -C -G -c 3 -C -i 4,10 -C -G -l
+    12
+    cut 3
+    11
+    replacing argument: 0x1d7df08
+    found local replacement: 0x1d7db80
+    inserted 10 before 4
+    12
+
+    $ ./a.out 
+    3
+    9
+
 License
 
   Licensed under the GPLV3, see the COPYING file in this directory for
