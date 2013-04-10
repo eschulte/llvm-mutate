@@ -56,4 +56,4 @@ test/greet-ins.bl: test/greet.ll
 	opt $(OPT_FLAGS) -insert -inst1=1 -inst2=2 $< -o $@
 
 real-clean:
-	rm -rf test/*
+	rm -rf test/* a.out
