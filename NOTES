@@ -36,14 +36,18 @@ pointers which may be useful
 
 ** TODO swap is really just two replaces, for a replace we need to
 we only really need to
+
 1. replace everything using the original with the new
+   : orig->replaceAllUsesWith(new)
+
 2. replace all arguments of the new with arguments of the original
    (or appropriate arguments selected from the environment)
-
-- when replacing it could be nice to do this
-  : PN->replaceAllUsesWith(Conv);
+   : user->op_iterator()
 
 * Notes
 ** use-def and def-use
 file:../../../docs/ProgrammersManual.html
 see Iterating over def-use & use-def chains
+
+
+** similarly read more about the value class and use user iterators
