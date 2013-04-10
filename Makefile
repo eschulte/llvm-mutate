@@ -31,6 +31,9 @@ test/arith.ll:
 test/arith-count: test/arith.ll
 	opt $(OPT_FLAGS) -count $< -o /dev/null
 
+test/arith-list: test/arith.ll
+	opt $(OPT_FLAGS) -list $< -o /dev/null
+
 test/arith-cut.bl: test/arith.ll
 	opt $(OPT_FLAGS) -cut -stmt1=4 $< -o $@
 
@@ -42,6 +45,9 @@ test/arith-swp.bl: test/arith.ll
 
 test/greet-count: test/greet.ll
 	opt $(OPT_FLAGS) -count $< -o /dev/null
+
+test/greet-list: test/greet.ll
+	opt $(OPT_FLAGS) -list $< -o /dev/null
 
 test/greet-cut.bl: test/greet.ll
 	opt $(OPT_FLAGS) -cut -stmt1=1 $< -o $@

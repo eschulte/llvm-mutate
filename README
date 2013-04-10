@@ -3,6 +3,7 @@ Manipulate LLVM assembly
 This tool performs the following operations
 
     count | prints the total number of statements
+     list | list instructions with their types and ids
       cut | deletes that numbered statement
    insert | copies the second numbered statement before the first
      swap | swaps the two numbered statements

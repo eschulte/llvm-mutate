@@ -42,6 +42,32 @@ namespace {
 }
 
 namespace {
+  struct List : public ModulePass {
+    static char ID;
+    List() : ModulePass(ID) {}
+
+    bool runOnModule(Module &M){
+      count = 0;
+      for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
+        walkFunction(I);
+      return false;
+    }
+
+    // We don't modify the program, so we preserve all analyses
+    virtual void getAnalysisUsage(AnalysisUsage &AU) const {
+      AU.setPreservesAll(); }
+
+  private:
+    int unsigned count;
+    void walkFunction(Function *F){
+      for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
+        count += 1;
+        errs() << count << "\t" << I->getType() << "\t" << I->getName() << "\n";
+      } }
+  };
+}
+
+namespace {
   struct Cut : public ModulePass {
     static char ID;
     Cut() : ModulePass(ID) {}
@@ -138,7 +164,7 @@ namespace {
       changed_p = false;
       for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
         walkCollect(I);
-      
+
       count = 0;
       // confirm that the types match
       if(temp1->getType() != temp2->getType()){
@@ -191,10 +217,12 @@ namespace {
 }
 
 char Count::ID = 0;
+char List::ID = 0;
 char Cut::ID = 0;
 char Insert::ID = 0;
 char Swap::ID = 0;
-static RegisterPass<Count>  W("count",  "count the number of instructions");
+static RegisterPass<Count>  V("count",  "count the number of instructions");
+static RegisterPass<List>   W("list",   "list instruction types w/counts");
 static RegisterPass<Cut>    X("cut",    "cut instruction number stmt1");
 static RegisterPass<Insert> Y("insert", "insert stmt2 before stmt1");
 static RegisterPass<Swap>   Z("swap",   "swap stmt1 and stmt2");
