@@ -1,3 +1,5 @@
 Debug+Asserts
 LLVMBuild.txt
 a.out
+*.ll
+*.bl

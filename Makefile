@@ -15,45 +15,13 @@ include $(LEVEL)/Makefile.common
 
 # Testing support
 OPT_FLAGS=-load ${LEVEL}/Debug+Asserts/lib/Mutate.so
+LLVMC=clang -x c - -S -emit-llvm
 
-test/greet.ll:
-	echo 'main(){ puts("hello"); puts("goodbye"); }'|clang -x c - -S -emit-llvm -o $@
+greet.ll:
+	echo 'main(){ puts("hello"); puts("goodbye"); }'|$(LLVMC) -o $@
 
-test/arith.ll:
-	echo 'main(){ int x=2; x+=10; x=x*x; return x;}'|clang -x c - -S -emit-llvm -o $@
-
-%.ll: %.bl
-	llvm-dis $< -o $@
-
-%: %.ll
-	cat $<|llc|clang -x assembler - -o $@
-
-test/arith-count: test/arith.ll
-	opt $(OPT_FLAGS) -count $< -o /dev/null
-
-test/arith-list: test/arith.ll
-	opt $(OPT_FLAGS) -list $< -o /dev/null
-
-test/arith-cut.bl: test/arith.ll
-	opt $(OPT_FLAGS) -cut -inst1=4 $< -o $@
-
-test/arith-ins.bl: test/arith.ll
-	opt $(OPT_FLAGS) -insert -inst1=5 -inst2=7 $< -o $@
-
-test/arith-swp.bl: test/arith.ll
-	opt $(OPT_FLAGS) -swap -inst1=6 -inst2=7 $< -o $@
-
-test/greet-count: test/greet.ll
-	opt $(OPT_FLAGS) -count $< -o /dev/null
-
-test/greet-list: test/greet.ll
-	opt $(OPT_FLAGS) -list $< -o /dev/null
-
-test/greet-cut.bl: test/greet.ll
-	opt $(OPT_FLAGS) -cut -inst1=1 $< -o $@
-
-test/greet-ins.bl: test/greet.ll
-	opt $(OPT_FLAGS) -insert -inst1=1 -inst2=2 $< -o $@
+arith.ll:
+	echo 'main(){ int x=2; x+=10; x=x*x; return x;}'|$(LLVMC) -o $@
 
 real-clean:
-	rm -rf test/* a.out
+	rm -f a.out *.ll *.bl
