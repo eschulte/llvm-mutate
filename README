@@ -138,15 +138,17 @@ Examples
   example the following command line will,
 
   1. print a count of instructions,
-  2. display the program call graph (w/the dot and feh programs),
-  3. cut an instruction,
-  4. print another count,
-  5. inserts an instruction,
-  6. prints a third instruction count,
-  7. display the new call graph
-  8. and finally link the resulting LLVM IR into an executable.
+  2. generate the program control flow graph
+     (shown on screen if dot and feh are installed),
+  3. generate the program call graph
+  4. cut an instruction,
+  5. print another count,
+  6. inserts an instruction,
+  7. prints a third instruction count,
+  8. display the new call graph
+  9. and finally link the resulting LLVM IR into an executable.
 
-    $ cat arith.ll|./llvm-mutate -C -G -c 3 -C -i 4,10 -C -G -l
+    $ cat arith.ll|./llvm-mutate -C -g -G -c 3 -C -i 4,10 -C -G -l
     12
     cut 3
     11
