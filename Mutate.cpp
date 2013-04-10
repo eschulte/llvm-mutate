@@ -15,6 +15,40 @@ Inst1("inst1", cl::init(0), cl::desc("first statement to mutate"));
 static cl::opt<unsigned>
 Inst2("inst2", cl::init(0), cl::desc("second statement to mutate"));
 
+// Search in the containing basic block before Instruction I to find a
+// value of Type T.  If no such value exists check global values, and
+// finally default to a Null of the appropriate type.
+void findInstanceOfType(Value *V, Type *T){
+  errs() << "findInstanceOfType called on "<<V<<" with "<<T<<"\n"; }
+
+// Replace the operands of Instruction I with in-scope values of the
+// same type.
+// 
+// NOTE: this might be relevant
+//   RemapInstruction(C, ValueMap, RF_NoModuleLevelChanges);
+void replaceOperands(Instruction *I){
+  // loop through operands,
+  for (User::op_iterator i = I->op_begin(), e = I->op_end(); i != e; ++i) {
+    Value *v = *i;
+
+    // don't touch global values
+    if (!isa<GlobalValue>(v)) {
+
+      // don't touch arguments to the current function
+      // TODO: convert Arg list to a set
+      // if(!I->getParent()->getParent()->getArgumentList().contains(v))
+
+      // Don't touch arguments which are in scope, we can check this
+      // by walking the basic block up to this point.
+      BasicBlock *B = I->getParent();
+      bool isInScope = false;
+      for (BasicBlock::iterator i = B->begin(); cast<Instruction>(i) != I; ++i)
+        if(i == v) { isInScope = true; break; }
+
+      if(!isInScope){
+        // If we've made it this far we really do have to find a replacement
+        findInstanceOfType(v, v->getType()); } } } }
+
 namespace {
   struct Count : public ModulePass {
     static char ID;
@@ -100,22 +134,6 @@ namespace {
       return false; }
 
   };
-}
-
-void replaceOperands(Instruction *I){
-  // TODO: need to populate any arguments to temp from the
-  //       available context, of possible use are
-  //   temp->getOperand(0)
-  //   temp->setName();
-  //
-  //   loop through operands,
-  //   keep globals
-  //   if locals are still in scope then keep them
-  //   else replace them with something of the same type from scope
-  //
-  // TODO: remap instruction operands
-  // // Eagerly remap the operands of the instruction.
-  // RemapInstruction(C, ValueMap, RF_NoModuleLevelChanges);
 }
 
 namespace {
