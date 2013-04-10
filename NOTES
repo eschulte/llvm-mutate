@@ -35,40 +35,45 @@ do this by folding it into its successor
 #+end_src
 
 ** TODO populated inserted instruction arguments from scope
-When inserting an instruction we need to
-1. give it arguments from the current scope
-2. assign its result into something in the current scope
+When inserting an instruction we need to do two things.
 
-pointers which may be useful
+1. find arguments from the current scope, =replaceOperands=.
 
-- RemapInstruction
-  : /// RemapInstruction - Convert the instruction operands from referencing the
-  : /// current values into those specified by VMap.
-  : static inline void RemapInstruction(Instruction *I, ValueToValueMapTy &VMap)
+   - RemapInstruction
+     : /// RemapInstruction - Convert the instruction operands from referencing the
+     : /// current values into those specified by VMap.
+     : static inline void RemapInstruction(Instruction *I, ValueToValueMapTy &VMap)
 
-  this is used a couple of places =RemapInstruction=, read its documentation
+     this is used a couple of places =RemapInstruction=, read its documentation
 
-- get arguments from nearby instructions
-  : ->getOperand(0)
+   - get arguments from nearby instructions
+     : ->getOperand(0)
 
-- set operand to something specific
-  : Clone->setArgOperand(0, Op);
+   - set operand to something specific
+     : Clone->setArgOperand(0, Op);
 
-- add input operands to an instruction
-  : // Insert new integer induction variable.
-  : PHINode *NewPHI = PHINode::Create(Int32Ty, 2, PN->getName()+".int", PN);
-  : NewPHI->addIncoming(ConstantInt::get(Int32Ty, InitValue),
-  :                     PN->getIncomingBlock(IncomingEdge));
+   - add input operands to an instruction
+     : // Insert new integer induction variable.
+     : PHINode *NewPHI = PHINode::Create(Int32Ty, 2, PN->getName()+".int", PN);
+     : NewPHI->addIncoming(ConstantInt::get(Int32Ty, InitValue),
+     :                     PN->getIncomingBlock(IncomingEdge));
 
-** TODO swap is really just two replaces, for a replace we need to
-we only really need to
+   - operation iterator
+     : user->op_iterator()
 
-1. replace everything using the original with the new
-   : orig->replaceAllUsesWith(new)
+2. assign its result into something in the current scope, this could
+   be as simple as just taking the next instruction which requires an
+   argument of the same type as the inserted instruction
+
+** TODO swap is really just two replaces
+To replace we need to,
+
+1. replace everything using the original with the new, this is done
+   by =ReplaceInstWithInst=
 
 2. replace all arguments of the new with arguments of the original
    (or appropriate arguments selected from the environment)
-   : user->op_iterator()
+   : replaceOperands
 
 * Notes
 ** use-def and def-use
