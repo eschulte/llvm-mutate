@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # llvm-mutate -[n|l|g|G] -[c|i|s instructions] -l -[o path]
-#  mutate llvm assembly code
+#  mutate llvm IR
 #
 # Options
 #  -C,--count ------ print the number of instructions
