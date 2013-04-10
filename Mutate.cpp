@@ -78,11 +78,13 @@ Value *findInstanceOfType(Instruction *I, Type *T){
 // same type.  If the operands are already in scope, then retain them.
 void replaceOperands(Instruction *I){
   // loop through operands,
+  int counter = -1;
   for (User::op_iterator i = I->op_begin(), e = I->op_end(); i != e; ++i) {
+    counter++;
     Value *v = *i;
 
     // don't touch global values
-    if (!isa<GlobalValue>(v)) {
+    if (!isa<GlobalValue>(v)){
 
       // don't touch arguments to the current function
       Function *F = I->getParent()->getParent();
@@ -101,7 +103,8 @@ void replaceOperands(Instruction *I){
 
         if(!isInScope){
           // If we've made it this far we really do have to find a replacement
-          v = findInstanceOfType(I, v->getType()); } } } }
+          errs() << "replacing argument: " << v << "\n";
+          I->setOperand(counter, findInstanceOfType(I, v->getType())); } } } }
 }
 
 namespace {
