@@ -53,7 +53,7 @@ Value *findInstanceOfType(Instruction *I, Type *T){
 
 // Replace the operands of Instruction I with in-scope values of the
 // same type.
-// 
+//
 // NOTE: this might be relevant
 //   RemapInstruction(C, ValueMap, RF_NoModuleLevelChanges);
 void replaceOperands(Instruction *I){
@@ -65,19 +65,23 @@ void replaceOperands(Instruction *I){
     if (!isa<GlobalValue>(v)) {
 
       // don't touch arguments to the current function
-      // TODO: convert Arg list to a set
-      // if(!I->getParent()->getParent()->getArgumentList().contains(v))
+      Function *F = I->getParent()->getParent();
+      bool isAnArgument = false;
+      for (Function::arg_iterator arg = F->arg_begin(), E = F->arg_end();
+           arg != E; ++arg) {
+        if( arg == v ){ isAnArgument = true; break; } }
 
-      // Don't touch arguments which are in scope, we can check this
-      // by walking the basic block up to this point.
-      BasicBlock *B = I->getParent();
-      bool isInScope = false;
-      for (BasicBlock::iterator i = B->begin(); cast<Instruction>(i) != I; ++i)
-        if(i == v) { isInScope = true; break; }
+      if(!isAnArgument) {
+        // Don't touch operands which are in scope
+        BasicBlock *B = I->getParent();
+        bool isInScope = false;
+        for (BasicBlock::iterator i = B->begin();
+             cast<Instruction>(i) != I; ++i)
+          if(i == v) { isInScope = true; break; }
 
-      if(!isInScope){
-        // If we've made it this far we really do have to find a replacement
-        v = findInstanceOfType(I, v->getType()); } } }
+        if(!isInScope){
+          // If we've made it this far we really do have to find a replacement
+          v = findInstanceOfType(I, v->getType()); } } } }
 }
 
 namespace {
@@ -218,7 +222,7 @@ namespace {
     // Use the result of Instruction I later in the Function in which it
     // is inserted.
     void useResult(Instruction *I){
-      
+
     }
   };
 }
