@@ -24,10 +24,13 @@ void useResult(Instruction *I){
   BasicBlock *B = I->getParent();
   BasicBlock::iterator Begin = I; ++Begin;
   for (BasicBlock::iterator i = Begin, E = B->end(); i != E; ++i){
+    Instruction *Inst = i;
+    int counter = -1;
     for (User::op_iterator i = I->op_begin(), e = I->op_end(); i != e; ++i){
+      counter++;
       Value *v = *i;
       if (v->getType() == I->getType()){
-        v = I;
+        Inst->setOperand(counter, I);
         return; } } }
   errs()<<"could find no use for result\n";
 }
