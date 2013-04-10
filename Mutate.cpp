@@ -153,12 +153,19 @@ namespace {
       for (Function::iterator B = F->begin(), E = F->end(); B != E; ++B) {
         for (BasicBlock::iterator I = B->begin(), E = B->end(); I != E; ++I) {
           count += 1;
-          if(count == Stmt1){
-            replaceOperands(temp);
-            temp->insertBefore(I);
+          if(count == Inst1){
+            temp->insertBefore(I); // insert temp before I
+            replaceOperands(temp); // wire incoming edges of CFG into temp
+            useResult(I);          // wire outgoing results of temp into CFG
             changed_p = true;
             return true; } } }
       return false; }
+
+    // Use the result of Instruction I later in the Function in which it
+    // is inserted.
+    void useResult(Instruction *I){
+      
+    }
   };
 }
 
