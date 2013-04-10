@@ -98,6 +98,22 @@ namespace {
   };
 }
 
+void replaceOperands(Instruction *V){
+  // TODO: need to populate any arguments to temp from the
+  //       available context, of possible use are
+  //   temp->getOperand(0)
+  //   temp->setName();
+  //
+  //   loop through operands,
+  //   keep globals
+  //   if locals are still in scope then keep them
+  //   else replace them with something of the same type from scope
+  //
+  // TODO: remap instruction operands
+  // // Eagerly remap the operands of the instruction.
+  // RemapInstruction(C, ValueMap, RF_NoModuleLevelChanges);
+}
+
 namespace {
   struct Insert : public ModulePass {
     static char ID;
@@ -136,14 +152,7 @@ namespace {
         for (BasicBlock::iterator I = B->begin(), E = B->end(); I != E; ++I) {
           count += 1;
           if(count == Stmt1){
-            // TODO: need to populate any arguments to temp from the
-            //       available context, of possible use are
-            //   temp->getOperand(0)
-            //   temp->setName();
-            //
-            // TODO: remap instruction operands
-            // // Eagerly remap the operands of the instruction.
-            // RemapInstruction(C, ValueMap, RF_NoModuleLevelChanges|RF_IgnoreMissingEntries);
+            replaceOperands(temp);
             temp->insertBefore(I);
             changed_p = true;
             return true; } } }
@@ -204,10 +213,12 @@ namespace {
           count += 1;
           if(count == Stmt2){
             ReplaceInstWithInst(I->getParent()->getInstList(), I, temp1);
+            replaceOperands(temp1);
             if(changed_p) return true;
             changed_p = true; }
           if(count == Stmt1){
             ReplaceInstWithInst(I->getParent()->getInstList(), I, temp2);
+            replaceOperands(temp2);
             if(changed_p) return true;
             changed_p = true; } } }
       return false; }
