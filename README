@@ -23,53 +23,48 @@ Examples
 
   See the behavior of the original.
 
-    $ cat greet.ll|llc|gcc -x assembler - -o greet
+    $ cat greet.ll|./llvm-mutate -l
 
-    $ ./greet
+    $ ./a.out
     hello
     goodbye
 
   Count the statements in the original program.
 
-    $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so \
-        -count greet.ll -o /dev/null
+    $ cat greet.ll|./llvm-mutate -C -o /dev/null
     3
 
   Cut the first statement from this program, compile and run.
 
-    $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so \
-        -cut -inst1=1 greet.ll -o cut.bl
+    $ cat greet.ll|./llvm-mutate -c 1 -l
     cut 1
 
-    $ cat cut.bl|llc|gcc -x assembler - -o cut
-
-    $ ./cut
+    $ ./a.out
     goodbye
 
   Insert the second statement before the first.
 
-    $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so \
-      -insert -inst1=1 -inst2=2 greet.ll -o insert.bl
+    $ cat greet.ll|./llvm-mutate -i 1,2 -l
+    replacing argument: 0x2614d78
     inserted 2 before 1
 
-    $ cat insert.bl|llc|gcc -x assembler - -o insert
+    $ ./a.out
+    zsh: segmentation fault (core dumped)  ./a.out
 
-    $ ./insert
+TODO: This is a bug, shouldn't be replacing this argument.
+      Should be as below.
+
+    $ ./a.out
     goodbye
     hello
     goodbye
 
   Swap the first two statements.
 
-    $ opt -load ${LLVM}/Debug+Asserts/lib/Mutate.so \
-      -swap -inst1=1 -inst2=2 greet.ll -o swap.bl
+    $ cat greet.ll|./llvm-mutate -s 1,2 -l
     swapped 1 with 2
 
-    $ cat swap.bl|llc|gcc -x assembler - -o swap
-
-    $ ./swap
-    goodbye
-    hello
+TODO: Same bug as above.
 
 License
 
