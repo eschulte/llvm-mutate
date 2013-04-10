@@ -45,14 +45,7 @@ Examples
   Insert the second statement before the first.
 
     $ cat greet.ll|./llvm-mutate -i 1,2 -l
-    replacing argument: 0x2614d78
     inserted 2 before 1
-
-    $ ./a.out
-    zsh: segmentation fault (core dumped)  ./a.out
-
-TODO: This is a bug, shouldn't be replacing this argument.
-      Should be as below.
 
     $ ./a.out
     goodbye
@@ -64,7 +57,9 @@ TODO: This is a bug, shouldn't be replacing this argument.
     $ cat greet.ll|./llvm-mutate -s 1,2 -l
     swapped 1 with 2
 
-TODO: Same bug as above.
+    $ ./a.out
+    goodbye
+    hello
 
 License
 
