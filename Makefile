@@ -32,7 +32,7 @@ test/arith-count: test/arith.ll
 	opt $(OPT_FLAGS) -count $< -o /dev/null
 
 test/arith-cut.bl: test/arith.ll
-	opt $(OPT_FLAGS) -cut -stmt1=3 $< -o $@
+	opt $(OPT_FLAGS) -cut -stmt1=4 $< -o $@
 
 test/arith-ins.bl: test/arith.ll
 	opt $(OPT_FLAGS) -insert -stmt1=5 -stmt2=7 $< -o $@
