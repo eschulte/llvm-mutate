@@ -15,11 +15,41 @@ Inst1("inst1", cl::init(0), cl::desc("first statement to mutate"));
 static cl::opt<unsigned>
 Inst2("inst2", cl::init(0), cl::desc("second statement to mutate"));
 
-// Search in the containing basic block before Instruction I to find a
-// value of Type T.  If no such value exists check global values, and
-// finally default to a Null of the appropriate type.
-void findInstanceOfType(Value *V, Type *T){
-  errs() << "findInstanceOfType called on "<<V<<" with "<<T<<"\n"; }
+// Find a value of Type T which can be used at Instruction I.  Search
+// in this order.
+// 1. values in Basic Block before I
+// 2. arguments to the function containing I
+// 3. global values
+// 4. null of the correct type
+// 5. return a 0 that the caller can stick where the sun don't shine
+Value *findInstanceOfType(Instruction *I, Type *T){
+  // local inside the Basic Block
+  BasicBlock *B = I->getParent();
+  for (BasicBlock::iterator prev = B->begin(); cast<Value>(prev) != I; ++prev){
+    if(prev->getType() == T){
+      errs()<<"found local replacement: "<<prev<<"\n";
+      return cast<Value>(prev); } }
+  // arguments to the function
+  Function *F = B->getParent();
+  for (Function::arg_iterator arg = F->arg_begin(), E = F->arg_end();
+       arg != E; ++arg){
+    if(arg->getType() == T){
+      errs()<<"found arg replacement: "<<arg<<"\n";
+      return cast<Value>(arg); } }
+  // global values
+  Module *M = F->getParent();
+  for (Module::global_iterator g = M->global_begin(), E = M->global_end();
+       g != E; ++g){
+    if(g->getType() == T){
+      errs()<<"found global replacement: "<<g<<"\n";
+      return cast<Value>(g); } }
+  // null
+  if(!isa<FunctionType>(T)){
+    return Constant::getNullValue(T);
+  }
+  errs()<<"findInstanceOfType failed to find anything, you're screwed\n";
+  return 0;
+}
 
 // Replace the operands of Instruction I with in-scope values of the
 // same type.
@@ -47,7 +77,8 @@ void replaceOperands(Instruction *I){
 
       if(!isInScope){
         // If we've made it this far we really do have to find a replacement
-        findInstanceOfType(v, v->getType()); } } } }
+        v = findInstanceOfType(I, v->getType()); } } }
+}
 
 namespace {
   struct Count : public ModulePass {
