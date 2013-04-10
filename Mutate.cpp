@@ -2,6 +2,7 @@
 // Copyright (C) 2013 Eric Schulte
 #include "llvm/Pass.h"
 #include "llvm/Module.h"
+#include "llvm/Instructions.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/InstIterator.h"
@@ -80,6 +81,9 @@ Value *findInstanceOfType(Instruction *I, Type *T){
 // Replace the operands of Instruction I with in-scope values of the
 // same type.  If the operands are already in scope, then retain them.
 void replaceOperands(Instruction *I){
+  // don't touch arguments of branch instructions
+  if(isa<BranchInst>(I)) return;
+
   // loop through operands,
   int counter = -1;
   for (User::op_iterator i = I->op_begin(), e = I->op_end(); i != e; ++i) {
