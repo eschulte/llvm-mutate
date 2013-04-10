@@ -1,12 +1,38 @@
                                                            -*- org -*-
-* Tasks [0/3]
-** TODO cut must correctly handle deletion of final instruction in block
+* Tasks [0/2]
+** cut must correctly handle deletion of final instruction in block
 do this by folding it into its successor
 : /// FoldBlockIntoPredecessor - Folds a basic block into its predecessor if it
 : /// only has one predecessor, and that predecessor only has one successor.
 : /// The LoopInfo Analysis that is passed will be kept consistent.
 : /// Returns the new combined block.
 : static BasicBlock *FoldBlockIntoPredecessor(BasicBlock *BB, LoopInfo* LI,
+
+#+begin_src C++
+  // If this is a terminator instruction we might have problems.
+  if(!isa<TerminatorInst>(I)){
+    BasicBlock *BB = I->getParent();
+    // merge into following block if only one exists
+    if(BB->getTerminator()->getNumSuccessors() != 1){
+      errs() << "can't merge with multiple subsequent blocks\n";
+    } else {
+      Function::iterator I = BB;
+      Function::iterator E = BB->getParent()->end();
+      if(BB == E){
+        errs() << "can't delete terminator of last block\n";
+      } else {
+        BasicBlock *Succ = I++;
+        if (! Succ->getSinglePredecessor()){
+          errs() << "next block has multiple preds, can't merge\n";
+          return false;
+        } else {
+          // merge with the following block
+          FoldSingleEntryPHINodes(Succ);
+          BB->getInstList().pop_back();
+          Succ->replaceAllUsesWith(BB);
+          BB->getInstList().splice(BB->end(), Succ->getInstList());
+          Succ->eraseFromParent(); } } } }
+#+end_src
 
 ** TODO populated inserted instruction arguments from scope
 When inserting an instruction we need to

@@ -90,13 +90,11 @@ namespace {
       for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
         count += 1;
         if(count == Stmt1){
-          // If this is a terminator instruction we might have problems.
-          // if(!isa<TerminatorInst>(I))
-          //   errs() << "Caution deleting terminator instruction\n";
           I->eraseFromParent();
           changed_p = true;
           return true; } }
       return false; }
+
   };
 }
 
