@@ -1,11 +1,14 @@
 #!/bin/bash
 #
-# llvm-mutate MUT-OP [OPTIONS] [INFILE]
+# llvm-mutate -[n|l] -[c|i|s instructions] -l -[o path]
 #  mutate llvm assembly code
 #
 # Options
-#  -1,--inst1 ----- the first instruction ID to mutate
-#  -2,--inst2 ----- the second instruction ID to mutate
+#  -C,--count ----- print the number of instructions
+#  -L,--list ------ list instructions with number and types
+#  -c,--cut ------- cut the given instruction
+#  -i,--insert ---- copy the second inst. before the first
+#  -s,--swap ------ swap the given instructions
 #  -l,--link ------ link the result into an executable
 #  -o,--out ------- write output to specified file
 #
@@ -17,28 +20,40 @@ HELP_TEXT=$(cat "$0" \
     |cut -c3-)
 LEVEL="../../.."
 OPT_FLAGS="-load ${LEVEL}/Debug+Asserts/lib/Mutate.so -f"
-OP="$1";shift;
 LINK=""
 OUT=""
+RAW=$(cat -)
 
-## Options
-eval set -- $(getopt -o h1:2:lo: -l help,inst1:,inst2:,link,out: -- "$@" \
+run(){ RAW="$(echo "$RAW"|opt ${OPT_FLAGS} $@|llvm-dis)"; }
+
+## Process Options
+eval set -- $(getopt \
+    -o hCLc:i:s:lo:f: \
+    -l help,count,list,cut:,insert:,swap:,link,out:,file: -- "$@" \
     || echo "$HELP_TEXT" && exit 1;)
 while [ $# -gt 0 ];do
     case $1 in
-        -h|--help)  echo "$HELP_TEXT" && exit 1;;
-        -1|--inst1) OPT_FLAGS+=" -inst1=$2"; shift;;
-        -2|--inst2) OPT_FLAGS+=" -inst2=$2"; shift;;
-        -l|--link)  LINK="yes";;
-        -o|--out)   OUT="$2"; shift;;
+        -h|--help) echo "$HELP_TEXT" && exit 1;;
+        -l|--link) LINK="yes";;
+        -o|--out)  OUT="$2"; shift;;
+        -f|--file) FILE="$2"; shift;;
+        -C|--count) run -count ;;
+        -L|--list) run -list ;;
+        -c|--cut) run -cut -inst1="$2"; shift;;
+        -i|--insert)
+            run -insert \
+                -inst1="$(echo $2|cut -d, -f1)" \
+                -inst2="$(echo $2|cut -d, -f2)"; shift;;
+        -s|--swap)
+            run -swap \
+                -inst1="$(echo $2|cut -d, -f1)" \
+                -inst2="$(echo $2|cut -d, -f2)"; shift;;
         (--) shift; break;;
         (-*) error "unrecognized option $1";;
         (*)  break;;
     esac
     shift
 done
-
-RAW=$(opt ${OPT_FLAGS} -$OP $1|llvm-dis)
 
 if [ ! -z "$LINK" ];then
     if [ -z "$OUT" ];then OUT=a.out; fi
