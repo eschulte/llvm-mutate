@@ -121,9 +121,9 @@ void replaceOperands(Instruction *I){
 }
 
 namespace {
-  struct Count : public ModulePass {
+  struct Ids : public ModulePass {
     static char ID;
-    Count() : ModulePass(ID) {}
+    Ids() : ModulePass(ID) {}
 
     bool runOnModule(Module &M){
       count = 0;
@@ -406,14 +406,14 @@ namespace {
   };
 }
 
-char Count::ID = 0;
+char Ids::ID = 0;
 char List::ID = 0;
 char Name::ID = 0;
 char Cut::ID = 0;
 char Insert::ID = 0;
 char Replace::ID = 0;
 char Swap::ID = 0;
-static RegisterPass<Count>   T("count",   "count the number of instructions");
+static RegisterPass<Ids>     T("ids",     "print the number of instructions");
 static RegisterPass<List>    U("list",    "list instruction types w/counts");
 static RegisterPass<Name>    V("name",    "name each instruction w/count");
 static RegisterPass<Cut>     W("cut",     "cut instruction number inst1");

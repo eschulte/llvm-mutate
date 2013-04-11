@@ -4,7 +4,7 @@
 #  mutate llvm IR
 #
 # Options
-#  -C,--count ------ print the number of instructions
+#  -I,--ids -------- print the number of instructions
 #  -L,--list ------- list instructions with number and types
 #  -n,--name ------- name each instruction w/number
 #  -g,--cfg -------- graph the CFG
@@ -54,15 +54,15 @@ graph(){
 
 ## Process Options
 eval set -- $(getopt \
-    -o CLngGc:r:i:s:lo:f: \
-    -l count,cfg,call-graph,list,name,cut:,replace:,insert:,swap:,link,out:,file: \
+    -o ILngGc:r:i:s:lo:f: \
+    -l ids,cfg,call-graph,list,name,cut:,replace:,insert:,swap:,link,out:,file: \
     -- "$@" || echo "$HELP_TEXT" && exit 1;)
 while [ $# -gt 0 ];do
     case $1 in
         -l|--link) LINK="yes";;
         -o|--out)  OUT="$2"; shift;;
         -f|--file) FILE="$2"; shift;;
-        -C|--count) run -count ;;
+        -I|--ids)   run -ids ;;
         -L|--list)  run -list ;;
         -n|--name)  run -name ;;
         -g|--cfg)   graph -dot-cfg ;;
