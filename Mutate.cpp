@@ -285,7 +285,7 @@ namespace {
     void walkCollect(Function *F){
       for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
         count += 1;
-        if (count == Inst1) {
+        if (count == Inst2) {
           temp = I->clone();
           if (!temp->getType()->isVoidTy()) {
             temp->setName(I->getName()+".replace1"); } } } }
@@ -294,7 +294,7 @@ namespace {
       for (Function::iterator B = F->begin(), E = F->end(); B != E; ++B) {
         for (BasicBlock::iterator I = B->begin(), E = B->end(); I != E; ++I) {
           count += 1;
-          if(count == Inst2){
+          if(count == Inst1){
             ReplaceInstWithInst(I->getParent()->getInstList(), I, temp);
             replaceOperands(temp);
             if(changed_p) return true;
