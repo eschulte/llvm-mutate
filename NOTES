@@ -1,6 +1,6 @@
                                                            -*- org -*-
-* Tasks [2/5]
-** TODO cut must correctly handle deletion of final instruction in block
+* Tasks [3/5]
+** TODO cut correctly handle deletion of final instruction in block
 do this by folding it into its successor
 : /// FoldBlockIntoPredecessor - Folds a basic block into its predecessor if it
 : /// only has one predecessor, and that predecessor only has one successor.
@@ -88,7 +88,13 @@ To replace we need to,
    (or appropriate arguments selected from the environment)
    : replaceOperands
 
-** TODO add a replace operator
+** DONE add a replace operator
+** TODO can't identify and replace %cmp values
+: cat branch.ll|./llvm-mutate -c 11
+
+Ideally subsequent uses of %cmp should be replaced with a default
+value like a false comparison.
+
 * Notes
 ** use-def and def-use
 file:../../../docs/ProgrammersManual.html
