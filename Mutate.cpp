@@ -276,7 +276,7 @@ namespace {
       for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
         if(walkPlace(I)) break;
 
-      if(changed_p) errs() << "replaceped " << Inst1 << " with " << Inst2 << "\n";
+      if(changed_p) errs() << "replaced " << Inst1 << " with " << Inst2 << "\n";
       else          errs() << "replace failed\n";
 
       return changed_p; }
