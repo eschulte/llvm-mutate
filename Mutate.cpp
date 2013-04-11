@@ -43,11 +43,13 @@ void useResult(Instruction *I){
 // 4. null of the correct type
 // 5. return a 0 that the caller can stick where the sun don't shine
 Value *findInstanceOfType(Instruction *I, Type *T){
+  bool isPointer = I->getType()->isPointerTy();
 
   // local inside the Basic Block
   BasicBlock *B = I->getParent();
   for (BasicBlock::iterator prev = B->begin(); cast<Value>(prev) != I; ++prev){
-    if(prev->getType() == T){
+    if((isPointer && prev->getType()->isPointerTy()) ||
+       (prev->getType() == T)){
       errs()<<"found local replacement: "<<prev<<"\n";
       return cast<Value>(prev); } }
 
@@ -55,7 +57,8 @@ Value *findInstanceOfType(Instruction *I, Type *T){
   Function *F = B->getParent();
   for (Function::arg_iterator arg = F->arg_begin(), E = F->arg_end();
        arg != E; ++arg){
-    if(arg->getType() == T){
+    if((isPointer && arg->getType()->isPointerTy()) ||
+       (arg->getType() == T)){
       errs()<<"found arg replacement: "<<arg<<"\n";
       return cast<Value>(arg); } }
 
@@ -63,7 +66,8 @@ Value *findInstanceOfType(Instruction *I, Type *T){
   Module *M = F->getParent();
   for (Module::global_iterator g = M->global_begin(), E = M->global_end();
        g != E; ++g){
-    if(g->getType() == T){
+    if((isPointer && g->getType()->isPointerTy()) ||
+       (g->getType() == T)){
       errs()<<"found global replacement: "<<g<<"\n";
       return cast<Value>(g); } }
 
