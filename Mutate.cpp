@@ -192,8 +192,10 @@ namespace {
           // TODO: once more thinking it would be good to glue basic
           //       blocks when we delete a terminating instruction
           Instruction *Inst = &*I;
-          if(!I->use_empty())
-            I->replaceAllUsesWith(findInstanceOfType(Inst,I->getType()));
+          if(!I->use_empty()){
+            Value *Val = findInstanceOfType(Inst,I->getType());
+            if(Val != 0){
+              I->replaceAllUsesWith(Val); } }
           I->eraseFromParent();
           changed_p = true;
           return true; } }
