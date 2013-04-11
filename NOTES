@@ -1,6 +1,6 @@
                                                            -*- org -*-
-* Tasks [1/2]
-** cut must correctly handle deletion of final instruction in block
+* Tasks [2/5]
+** TODO cut must correctly handle deletion of final instruction in block
 do this by folding it into its successor
 : /// FoldBlockIntoPredecessor - Folds a basic block into its predecessor if it
 : /// only has one predecessor, and that predecessor only has one successor.
@@ -8,7 +8,7 @@ do this by folding it into its successor
 : /// Returns the new combined block.
 : static BasicBlock *FoldBlockIntoPredecessor(BasicBlock *BB, LoopInfo* LI,
 
-#+begin_src C++
+#+begin_src c++
   // If this is a terminator instruction we might have problems.
   if(!isa<TerminatorInst>(I)){
     BasicBlock *BB = I->getParent();
@@ -32,6 +32,19 @@ do this by folding it into its successor
           Succ->replaceAllUsesWith(BB);
           BB->getInstList().splice(BB->end(), Succ->getInstList());
           Succ->eraseFromParent(); } } } }
+#+end_src
+
+Here's the beginning of such a function.
+#+begin_src c++
+  // If this instruction is a terminator, then erase the remainder of the
+  // basic block behind it.
+  void terminateIfTerminator(Instruction *I){
+    if(!isa<TerminatorInst>(I)) return;
+    BasicBlock *B = I->getParent();
+    BasicBlock::iterator Iter = I;
+    for (BasicBlock::iterator i = B->end(); i != Iter; --i){
+      i->eraseFromParent(); }
+  }
 #+end_src
 
 ** DONE populated inserted instruction arguments from scope
@@ -65,7 +78,7 @@ When inserting an instruction we need to do two things.
    be as simple as just taking the next instruction which requires an
    argument of the same type as the inserted instruction
 
-** TODO swap is really just two replaces
+** DONE swap is really just two replaces
 To replace we need to,
 
 1. replace everything using the original with the new, this is done
@@ -75,6 +88,7 @@ To replace we need to,
    (or appropriate arguments selected from the environment)
    : replaceOperands
 
+** TODO add a replace operator
 * Notes
 ** use-def and def-use
 file:../../../docs/ProgrammersManual.html
