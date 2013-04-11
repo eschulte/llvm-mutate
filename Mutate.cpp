@@ -67,6 +67,10 @@ Value *findInstanceOfType(Instruction *I, Type *T){
       errs()<<"found global replacement: "<<g<<"\n";
       return cast<Value>(g); } }
 
+  // TODO: types which could be replaced with sane default
+  //       - result of comparisons
+  //       - nulls or zeros for number types
+
   // Give up with a 0
   return 0;
 }
