@@ -89,11 +89,24 @@ To replace we need to,
    : replaceOperands
 
 ** DONE add a replace operator
-** TODO can't identify and replace %cmp values
+** TODO better type matching, labels with labels etc
+
+Take a look at the TypeID, which we may be able to cast from.
+http://llvm.org/docs/doxygen/html/classllvm_1_1Type.html#a5e9e1c0dd93557be1b4ad72860f3cbda
+
+*** Types may be mutated
+There is a mutateType function on values, so maybe we should mutate a
+readily available type if we can't find one we like.
+
+*** Here's a specific example, where two cmp values aren't matched
 : cat branch.ll|./llvm-mutate -c 11
 
 Ideally subsequent uses of %cmp should be replaced with a default
 value like a false comparison.
+
+** remove the use of stdio
+There must be a native llvm way to construct these names.
+(see the sprintf usage in Name).
 
 * Notes
 ** use-def and def-use

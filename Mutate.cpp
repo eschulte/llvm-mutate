@@ -1,4 +1,5 @@
 // Copyright (C) 2013 Eric Schulte
+#include <stdio.h>
 #include "llvm/Pass.h"
 #include "llvm/Module.h"
 #include "llvm/Instructions.h"
@@ -171,6 +172,36 @@ namespace {
         for (User::op_iterator i = I->op_begin(), e = I->op_end(); i != e; ++i)
           errs() << "\t" << cast<Value>(i)->getType();
         errs() << "\n"; } }
+  };
+}
+
+namespace {
+  struct Name : public ModulePass {
+    static char ID;
+    Name() : ModulePass(ID) {}
+
+    bool runOnModule(Module &M){
+      count = 0;
+      for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
+        walkFunction(I);
+      return false;
+    }
+
+    // We don't modify the program, so we preserve all analyses
+    virtual void getAnalysisUsage(AnalysisUsage &AU) const {
+      AU.setPreservesAll(); }
+
+  private:
+    int unsigned count;
+
+    void walkFunction(Function *F){
+      for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
+        count += 1;
+
+        if (!I->getType()->isVoidTy()){
+          char buf[24];
+          sprintf(buf, "inst.%d", count);
+          I->setName(buf); } } }
   };
 }
 
@@ -377,12 +408,14 @@ namespace {
 
 char Count::ID = 0;
 char List::ID = 0;
+char Name::ID = 0;
 char Cut::ID = 0;
 char Insert::ID = 0;
 char Replace::ID = 0;
 char Swap::ID = 0;
-static RegisterPass<Count>   U("count",   "count the number of instructions");
-static RegisterPass<List>    V("list",    "list instruction types w/counts");
+static RegisterPass<Count>   T("count",   "count the number of instructions");
+static RegisterPass<List>    U("list",    "list instruction types w/counts");
+static RegisterPass<Name>    V("name",    "name each instruction w/count");
 static RegisterPass<Cut>     W("cut",     "cut instruction number inst1");
 static RegisterPass<Insert>  X("insert",  "insert inst2 before inst1");
 static RegisterPass<Replace> Y("replace", "replace inst1 and inst2");

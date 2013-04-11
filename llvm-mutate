@@ -6,6 +6,7 @@
 # Options
 #  -C,--count ------ print the number of instructions
 #  -L,--list ------- list instructions with number and types
+#  -n,--name ------- name each instruction w/number
 #  -g,--cfg -------- graph the CFG
 #  -G,--call-graph - graph the call graph
 #  -c,--cut -------- cut the given instruction
@@ -53,8 +54,8 @@ graph(){
 
 ## Process Options
 eval set -- $(getopt \
-    -o CLgGc:r:i:s:lo:f: \
-    -l count,cfg,call-graph,list,cut:,replace:,insert:,swap:,link,out:,file: \
+    -o CLngGc:r:i:s:lo:f: \
+    -l count,cfg,call-graph,list,name,cut:,replace:,insert:,swap:,link,out:,file: \
     -- "$@" || echo "$HELP_TEXT" && exit 1;)
 while [ $# -gt 0 ];do
     case $1 in
@@ -63,6 +64,7 @@ while [ $# -gt 0 ];do
         -f|--file) FILE="$2"; shift;;
         -C|--count) run -count ;;
         -L|--list)  run -list ;;
+        -n|--name)  run -name ;;
         -g|--cfg)   graph -dot-cfg ;;
         -G|--call-graph) graph -dot-callgraph ;;
         -c|--cut)   run -cut -inst1="$2"; shift;;
