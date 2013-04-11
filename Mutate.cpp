@@ -67,13 +67,7 @@ Value *findInstanceOfType(Instruction *I, Type *T){
       errs()<<"found global replacement: "<<g<<"\n";
       return cast<Value>(g); } }
 
-  // null
-  if(!isa<FunctionType>(T)){
-    return Constant::getNullValue(T);
-  }
-
-  // give up
-  errs()<<"findInstanceOfType failed to find anything, you're screwed\n";
+  // Give up with a 0
   return 0;
 }
 
