@@ -5,7 +5,7 @@ This tool performs the following operations (among others)
       ids | prints the total number of instructions
      list | list instructions with their types and ids
      name | name each instruction by its id
-      cut | deletes that numbered instruction
+      cut | cuts the numbered instruction
    insert | copies the second numbered instruction before the first
   replace | replace inst1 with inst2
      swap | swaps the two numbered instructions
