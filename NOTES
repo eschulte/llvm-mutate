@@ -1,4 +1,77 @@
-                                                           -*- org -*-
+Notes and Tasks                                            -*- org -*-
+
+* Notes
+** Types of Mutations
+The three phases of development of this tool.
+Could also serve as the top level of a taxonomy of mutations.
+
+- side-effect :: manipulating side-effect instructions (e.g.,
+                 =pritnf=), super easy, didn't need to worry about
+                 results of instructions, and changing them directly
+                 changes when and what the side effects do.  For
+                 example manipulations on =greet.ll=.
+- data-flow :: strings of instructions which change the state of the
+               system.  This becomes more complex because we now need
+               to feed local edges of the CFG into newly added
+               instructions, weave the results of new instructions
+               back into the CFG and patch up CFG holes after removing
+               instructions.  For example manipulations on =arith.ll=.
+- control-flow :: modifications which actually affect the flow of
+                  control through the program.  Modification of
+                  comparison instructions, labels and branch
+                  instructions.  Ultimately this will probably also
+                  include some basic block operations e.g., stitching
+                  two basic blocks together when e.g., we remove the
+                  terminator of the leading BB.  For example
+                  operations on =branch.ll=.
+
+** Primary functions
+A couple of basic operations are needed across mutation types and are
+implemented as core functions.  The following will list them and their
+uses.
+
+*** find instance of type
+    :PROPERTIES:
+    :CUSTOM_ID: findInstanceOfType
+    :END:
+Find a value available in the program around a given instruction which
+has a certain type.  This is used to satisfy the operands of newly
+inserted instructions (e.g., [[#replaceOperands][replace operands]]) and to replace the
+results of a cut instruction.
+
+For an instruction I of type T.
+1. values in Basic Block before I of type T
+2. arguments to the function containing I of type T
+3. global values of type T
+4. give up and return a 0
+
+This function needs a better more forgiving way of comparing types,
+currently it doesn't do a good enough job of satisfying e.g.,
+comparison output types.
+
+*** use result
+    :PROPERTIES:
+    :CUSTOM_ID: useResult
+    :END:
+Used to plug the output of an instruction into the CFG local to the
+instruction.  For example to use the result of a newly inserted
+instruction.
+
+Looks for the first opening of the correct type, and inserts there.
+We let the rest of LLVM clean up and dangling SSA registers.
+
+*** replace operands
+    :PROPERTIES:
+    :CUSTOM_ID: replaceOperands
+    :END:
+This satisfies the operands of a newly inserted instruction.  It is
+largely just a wrapper around [[#findInstanceOfType][find instance of type]], but with an
+initial phase when limits the replacement to instructions which are
+actually *not* in scope.
+
+** Reference
+- file:../../../docs/ProgrammersManual.html
+
 * Tasks [3/5]
 ** TODO cut correctly handle deletion of final instruction in block
 do this by folding it into its successor
@@ -108,10 +181,3 @@ value like a false comparison.
 There must be a native llvm way to construct these names.
 (see the sprintf usage in Name).
 
-* Notes
-** use-def and def-use
-file:../../../docs/ProgrammersManual.html
-see Iterating over def-use & use-def chains
-
-
-** similarly read more about the value class and use user iterators
