@@ -105,8 +105,10 @@ void replaceOperands(Instruction *I){
 
         if(!isInScope){
           // If we've made it this far we really do have to find a replacement
-          errs() << "replacing argument: " << v << "\n";
-          I->setOperand(counter, findInstanceOfType(I, v->getType())); } } } }
+          Value *val = findInstanceOfType(I, v->getType());
+          if(val != 0){
+            errs() << "replacing argument: " << v << "\n";
+            I->setOperand(counter, val); } } } } }
 }
 
 namespace {
@@ -255,11 +257,55 @@ namespace {
 }
 
 namespace {
+  struct Replace : public ModulePass {
+    static char ID; // pass identification
+    Replace() : ModulePass(ID) {}
+
+    bool runOnModule(Module &M){
+      count = 0;
+      changed_p = false;
+      for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
+        walkCollect(I);
+      count = 0;
+      for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
+        if(walkPlace(I)) break;
+
+      if(changed_p) errs() << "replaceped " << Inst1 << " with " << Inst2 << "\n";
+      else          errs() << "replace failed\n";
+
+      return changed_p; }
+
+  private:
+    int unsigned count;
+    bool changed_p;
+    BasicBlock::iterator temp;
+
+    void walkCollect(Function *F){
+      for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
+        count += 1;
+        if (count == Inst1) {
+          temp = I->clone();
+          if (!temp->getType()->isVoidTy()) {
+            temp->setName(I->getName()+".replace1"); } } } }
+
+    bool walkPlace(Function *F){
+      for (Function::iterator B = F->begin(), E = F->end(); B != E; ++B) {
+        for (BasicBlock::iterator I = B->begin(), E = B->end(); I != E; ++I) {
+          count += 1;
+          if(count == Inst2){
+            ReplaceInstWithInst(I->getParent()->getInstList(), I, temp);
+            replaceOperands(temp);
+            if(changed_p) return true;
+            changed_p = true; } } }
+      return false; }
+  };
+}
+
+namespace {
   struct Swap : public ModulePass {
     static char ID; // pass identification
     Swap() : ModulePass(ID) {}
 
-    // Count up all operations in the module
     bool runOnModule(Module &M){
       count = 0;
       changed_p = false;
@@ -323,9 +369,11 @@ char Count::ID = 0;
 char List::ID = 0;
 char Cut::ID = 0;
 char Insert::ID = 0;
+char Replace::ID = 0;
 char Swap::ID = 0;
-static RegisterPass<Count>  V("count",  "count the number of instructions");
-static RegisterPass<List>   W("list",   "list instruction types w/counts");
-static RegisterPass<Cut>    X("cut",    "cut instruction number inst1");
-static RegisterPass<Insert> Y("insert", "insert inst2 before inst1");
-static RegisterPass<Swap>   Z("swap",   "swap inst1 and inst2");
+static RegisterPass<Count>   U("count",   "count the number of instructions");
+static RegisterPass<List>    V("list",    "list instruction types w/counts");
+static RegisterPass<Cut>     W("cut",     "cut instruction number inst1");
+static RegisterPass<Insert>  X("insert",  "insert inst2 before inst1");
+static RegisterPass<Replace> Y("replace", "replace inst1 and inst2");
+static RegisterPass<Swap>    Z("swap",    "swap inst1 and inst2");

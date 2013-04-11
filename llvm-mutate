@@ -9,6 +9,7 @@
 #  -g,--cfg -------- graph the CFG
 #  -G,--call-graph - graph the call graph
 #  -c,--cut -------- cut the given instruction
+#  -r,--replace ---- replace the first inst. with the second
 #  -i,--insert ----- copy the second inst. before the first
 #  -s,--swap ------- swap the given instructions
 #  -l,--link ------- link the result into an executable
@@ -52,12 +53,11 @@ graph(){
 
 ## Process Options
 eval set -- $(getopt \
-    -o hCLgGc:i:s:lo:f: \
-    -l help,count,cfg,call-graph,list,cut:,insert:,swap:,link,out:,file: \
+    -o CLgGc:r:i:s:lo:f: \
+    -l count,cfg,call-graph,list,cut:,replace:,insert:,swap:,link,out:,file: \
     -- "$@" || echo "$HELP_TEXT" && exit 1;)
 while [ $# -gt 0 ];do
     case $1 in
-        -h|--help) echo "$HELP_TEXT" && exit 1;;
         -l|--link) LINK="yes";;
         -o|--out)  OUT="$2"; shift;;
         -f|--file) FILE="$2"; shift;;
@@ -66,6 +66,10 @@ while [ $# -gt 0 ];do
         -g|--cfg)   graph -dot-cfg ;;
         -G|--call-graph) graph -dot-callgraph ;;
         -c|--cut)   run -cut -inst1="$2"; shift;;
+        -r|--replace)
+            run -replace \
+                -inst1="$(echo $2|cut -d, -f1)" \
+                -inst2="$(echo $2|cut -d, -f2)"; shift;;
         -i|--insert)
             run -insert \
                 -inst1="$(echo $2|cut -d, -f1)" \
