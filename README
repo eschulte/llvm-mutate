@@ -154,7 +154,7 @@ Examples
 
   1. print a count of instruction ids,
   2. generate the program control flow graph
-     (shown on screen if dot and feh are installed),
+     (shown on screen if `dot` and `feh` are installed),
   3. generate the program call graph
   4. cut an instruction,
   5. print another id count,
