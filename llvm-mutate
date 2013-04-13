@@ -23,7 +23,7 @@ HELP_TEXT=$(cat "$0" \
     |sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' \
     |cut -c3-)
 if echo "$1"|grep -q "\-h";then
-    echo "$HELP_TEXT"; exit 1;
+    echo "$HELP_TEXT"; exit 0;
 fi
 if [ -z "$LLVM" ];then
     if [ -d "Debug+Asserts" ];then # prob. in the source directory
