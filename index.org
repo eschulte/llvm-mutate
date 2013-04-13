@@ -35,10 +35,10 @@ performed on the data dependency graph to both (1) replace the use of
 removed instructions, and to (2) fully incorporate added instructions.
 
 1. Removed instructions.
-   file:removed-instructions.jpg
+   file:removed-instruction.png
 
 2. Added instruction.
-   file:added-instructions.jpg
+   file:added-instruction.png
 
 * Instillation
   :PROPERTIES:
@@ -82,9 +82,9 @@ for more information.
 
 [fn:1] http://llvm.org/docs/WritingAnLLVMPass.html
 
-[fn:2] gp fieldguide
+[fn:2] http://www.gp-field-guide.org.uk/
 
-[fn:3] mutation testing link
+[fn:3] [[http://scholar.google.com/scholar?as_q=&as_epq=An+analysis+and+survey+of+the+development+of+mutation+testing&as_oq=&as_eq=&as_occt=any&as_sauthors=Jia&as_publication=ieee&as_ylo=2011&as_yhi=2011&btnG=&hl=en&as_sdt=0%2C32][An analysis and survey of the development of mutation testing]]
 
 [fn:4] Help information for the =llvm-mutate= script.
        #+begin_src sh :results output
