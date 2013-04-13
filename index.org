@@ -1,0 +1,236 @@
+# -*- org-export-html-postamble:nil org-html-footnote-format:"<small>[%s]</small>" -*-
+#+HTML_HEAD: <style>pre{background:#232323; color:#E6E1DC;} @media(min-width:800px){div#content{max-width:800px; padding:2em; margin:auto;}}</style>
+#+Title: llvm-mutate -- mutate LLVM IR
+#+Author: Eric Schulte
+#+Options: toc:1 ^:nil
+
+* Introduction
+  :PROPERTIES:
+  :CUSTOM_ID: introduction
+  :END:
+LLVM Mutate is an LLVM compilers pass [fn:1].  Like all compiler
+passes, it manipulates LLVM intermediate representation (IR), but
+unlike most compiler passes it explicitly does *not* preserve
+semantics.  Instead it provides a number of simple mutation operations
+which may be specified through command line flags.  These operations
+are more similar to genetic programming [fn:2] or mutation
+testing [fn:3] operations than they are to traditional compiler
+transformations.
+
+Mutation Operations
+- ids :: prints the total number of instructions
+- list :: lists each instruction with its type and its assigned id
+- name :: names each instruction (using LLVM's [[http://llvm.org/docs/doxygen/html/classllvm_1_1Value.html#a35ee267850af7c235474a8c46c7ac5af][Value.setName]])
+- cut :: removes the numbered instruction from the program
+- insert :: copies the second numbered instruction before the first
+- replace :: replace the first numbered instruction with the second
+- swap :: swaps the two numbered instructions
+
+The =llvm-mutate= shell script wraps this compiler pass in a simple
+interface which facilitates program manipulation.  See the [[#examples][examples]]
+and the help output [fn:4]
+
+To support application of these simple operations some surgery must be
+performed on the data dependency graph to both (1) replace the use of
+removed instructions, and to (2) fully incorporate added instructions.
+
+1. Removed instructions.
+   file:removed-instructions.jpg
+
+2. Added instruction.
+   file:added-instructions.jpg
+
+* Instillation
+  :PROPERTIES:
+  :CUSTOM_ID: instillation
+  :END:
+
+1. Copy or clone this repository to =llvm/lib/Transforms/Mutate= in
+   your LLVM source tree,
+
+2. Run =make= from within the Mutate directory.  See [fn:1] for more
+   information on building LLVM compiler passes.
+
+3. Place the =llvm-mutate= script in your path.  It may be necessary
+   to set the =LLVM= environment variable to the base of your LLVM
+   install so that the =llvm-mutate= script can load the =Mutate.so=
+   shared library (Note: if you re-install LLVM after adding this
+   repository to the Transforms directory setting the =LLVM=
+   environment variable should not be necessary).
+
+* Examples
+  :PROPERTIES:
+  :CUSTOM_ID: examples
+  :results:  verbatim
+  :exports: both
+  :END:
+
+** Simple side-effect instructions
+1. First compile a source file to LLVM assembly.
+
+   #+begin_src sh :results none
+   echo 'main(){ puts("hello"); puts("goodbye");}' \
+     |clang -x c - -S -emit-llvm -o greet.ll
+   #+end_src
+
+2. See the behavior of the original.  The =-l= flag to =llvm-mutate=
+   causes it to link the resulting IR into an executable.
+
+   #+begin_src sh :results none
+   cat greet.ll|./llvm-mutate -l
+   ./a.out
+   #+end_src
+
+3. Count the instruction ids in the original program.  The count is
+   printed to STDERR so that the IR printed to STDOUT may be used by
+   another program or directed to a file.
+
+   #+begin_src sh
+   cat greet.ll|./llvm-mutate -I > /dev/null 2>&1
+   #+end_src
+
+4. Cut the first instruction from this program, compile and run.
+
+   #+begin_src sh
+   cat greet.ll|./llvm-mutate -c 1 -l
+   ./a.out
+   #+end_src
+
+5. Insert the second instruction before the first.
+
+   #+begin_src sh
+     cat greet.ll|./llvm-mutate -i 1,2 -l
+   #+end_src
+     
+   #+begin_src sh
+   ./a.out
+   #+end_src
+
+   #+RESULTS:
+   : goodbye
+   : hello
+   : goodbye
+
+   Swap the first two instructions.
+
+   #+begin_src sh
+   cat greet.ll|./llvm-mutate -s 1,2 -l
+   ./a.out
+   #+end_src
+
+** Data Flow Instructions
+We can also look at a slightly more complicated file which actually
+has some data dependencies between instructions.  Dependencies which
+the mutation tool will need to address.
+
+1. First we build a simple arithmetic program which passes the
+   variable =x= between a number of instructions.
+   #+begin_src sh
+   make arith.ll
+   cat arith.ll|./llvm-mutate -l
+   ./a.out
+   #+end_src
+
+2. Here mutations will change the data dependencies between the
+   instructions.
+
+   #+begin_src sh
+   cat arith.ll|./llvm-mutate -c 4 -l
+   ./a.out
+   #+end_src
+
+   #+begin_src sh
+   cat arith.ll|./llvm-mutate -c 3 -l
+   ./a.out
+   #+end_src
+
+   #+begin_src sh
+   cat arith.ll|./llvm-mutate -c 6 -l
+   ./a.out
+   #+end_src
+
+3. LLVM Mutate attempts to plug new instructions into the operands of
+   inserted instructions, satisfying their arguments with in-scope
+   variables and plugging their output into the arguments of
+   subsequent variables.
+
+   #+begin_src sh
+   cat arith.ll|./llvm-mutate -i 6,9 -l
+   ./a.out
+   #+end_src
+
+   When this isn't possible, a warning is printed and the insertion
+   likely has no effect.
+
+   #+begin_src sh
+   cat arith.ll|./llvm-mutate -i 4,10 -l 2>&1
+   ./a.out
+   #+end_src
+
+   Unless the results of the inserted instruction are not used.  For
+   example this copies the printf instruction into the middle of the
+   function.
+
+   #+begin_src sh
+   cat arith.ll|./llvm-mutate -i 4,11 -l
+   ./a.out
+   #+end_src
+
+4. See the output of =llvm-mutate --help= [fn:4] for more actions
+   which may be performed on compiled llvm IR.  If multiple options
+   are given to llvm-mutate they will be applied in series to the
+   code.  So for example the following command line
+   : cat arith.ll|./llvm-mutate -I -g -G -c 3 -I -i 4,10 -I -G -l
+   will,
+
+   1. print a count of instruction ids,
+   2. generate the program control flow graph
+      (shown on screen if dot and feh are installed),
+   3. generate the program call graph
+   4. cut an instruction,
+   5. print another id count,
+   6. inserts an instruction,
+   7. prints a third instruction id count,
+   8. display the new call graph
+   9. and finally link the resulting LLVM IR into an executable.
+
+* License
+  :PROPERTIES:
+  :CUSTOM_ID: license
+  :END:
+
+Licensed under the GPLV3, see the [[file:COPYING]] file in this directory
+for more information.
+
+* Footnotes
+  :PROPERTIES:
+  :exports:  both
+  :END:
+
+[fn:1] http://llvm.org/docs/WritingAnLLVMPass.html
+
+[fn:2] gp fieldguide
+
+[fn:3] mutation testing link
+
+[fn:4] Help information for the =llvm-mutate= script.
+       #+begin_src sh :results output
+         llvm-mutate --help
+       #+end_src
+
+       #+RESULTS:
+       : llvm-mutate -[n|l|g|G] -[c|i|s instructions] -l -[o path]
+       :  mutate llvm IR
+       : 
+       : Options
+       :  -I,--ids -------- print the number of instructions
+       :  -L,--list ------- list instructions with number and types
+       :  -n,--name ------- name each instruction w/number
+       :  -g,--cfg -------- graph the CFG
+       :  -G,--call-graph - graph the call graph
+       :  -c,--cut -------- cut the given instruction
+       :  -r,--replace ---- replace the first inst. with the second
+       :  -i,--insert ----- copy the second inst. before the first
+       :  -s,--swap ------- swap the given instructions
+       :  -l,--link ------- link the result into an executable
+       :  -o,--out -------- write output to specified file

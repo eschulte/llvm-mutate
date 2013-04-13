@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>llvm-mutate &#x2013; mutate LLVM IR</title>
+<!-- 2013-04-13 Sat 12:48 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="Eric Schulte"/>
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<style>pre{background:#232323; color:#E6E1DC;} @media(min-width:800px){div#content{max-width:800px; padding:2em; margin:auto;}}</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">llvm-mutate &#x2013; mutate LLVM IR</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#introduction">1. Introduction</a></li>
+<li><a href="#instillation">2. Instillation</a></li>
+<li><a href="#examples">3. Examples</a></li>
+<li><a href="#license">4. License</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-introduction" class="outline-2">
+<h2 id="introduction"><a id="sec-1" name="sec-1"></a><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-introduction">
+<p>
+LLVM Mutate is an LLVM compilers pass <sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>.  Like all compiler
+passes, it manipulates LLVM intermediate representation (IR), but
+unlike most compiler passes it explicitly does <b>not</b> preserve
+semantics.  Instead it provides a number of simple mutation operations
+which may be specified through command line flags.  These operations
+are more similar to genetic programming <sup><a id="fnr.2" name="fnr.2" class="footref" href="#fn.2">2</a></sup> or mutation
+testing <sup><a id="fnr.3" name="fnr.3" class="footref" href="#fn.3">3</a></sup> operations than they are to traditional compiler
+transformations.
+</p>
+
+<p>
+Mutation Operations
+</p>
+<dl class="org-dl">
+<dt> ids </dt><dd>prints the total number of instructions
+</dd>
+<dt> list </dt><dd>lists each instruction with its type and its assigned id
+</dd>
+<dt> name </dt><dd>names each instruction (using LLVM's <a href="http://llvm.org/docs/doxygen/html/classllvm_1_1Value.html#a35ee267850af7c235474a8c46c7ac5af">Value.setName</a>)
+</dd>
+<dt> cut </dt><dd>removes the numbered instruction from the program
+</dd>
+<dt> insert </dt><dd>copies the second numbered instruction before the first
+</dd>
+<dt> replace </dt><dd>replace the first numbered instruction with the second
+</dd>
+<dt> swap </dt><dd>swaps the two numbered instructions
+</dd>
+</dl>
+
+<p>
+The <code>llvm-mutate</code> shell script wraps this compiler pass in a simple
+interface which facilitates program manipulation.  See the <a href="#examples">examples</a>
+and the help output <sup><a id="fnr.4" name="fnr.4" class="footref" href="#fn.4">4</a></sup>
+</p>
+
+<p>
+To support application of these simple operations some surgery must be
+performed on the data dependency graph to both (1) replace the use of
+removed instructions, and to (2) fully incorporate added instructions.
+</p>
+
+<ol class="org-ol">
+<li>Removed instructions.
+   <img src="removed-instructions.jpg"  alt="removed-instructions.jpg"/>
+</li>
+
+<li>Added instruction.
+   <img src="added-instructions.jpg"  alt="added-instructions.jpg"/>
+</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-instillation" class="outline-2">
+<h2 id="instillation"><a id="sec-2" name="sec-2"></a><span class="section-number-2">2</span> Instillation</h2>
+<div class="outline-text-2" id="text-instillation">
+
+<ol class="org-ol">
+<li>Copy or clone this repository to <code>llvm/lib/Transforms/Mutate</code> in
+your LLVM source tree,
+</li>
+
+<li>Run <code>make</code> from within the Mutate directory.  See <sup><a id="fnr.1.100" name="fnr.1.100" class="footref" href="#fn.1">1</a></sup> for more
+information on building LLVM compiler passes.
+</li>
+
+<li>Place the <code>llvm-mutate</code> script in your path.  It may be necessary
+to set the <code>LLVM</code> environment variable to the base of your LLVM
+install so that the <code>llvm-mutate</code> script can load the <code>Mutate.so</code>
+shared library (Note: if you re-install LLVM after adding this
+repository to the Transforms directory setting the <code>LLVM</code>
+environment variable should not be necessary).
+</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-examples" class="outline-2">
+<h2 id="examples"><a id="sec-3" name="sec-3"></a><span class="section-number-2">3</span> Examples</h2>
+<div class="outline-text-2" id="text-examples">
+</div>
+
+<div id="outline-container-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Simple side-effect instructions</h3>
+<div class="outline-text-3" id="text-3-1">
+<ol class="org-ol">
+<li>First compile a source file to LLVM assembly.
+
+<div class="org-src-container">
+
+<pre class="src src-sh"><span style="color: #ad7fa8;">echo</span> <span style="color: #e9b96e;">'main(){ puts("hello"); puts("goodbye");}'</span> <span style="color: #e9b96e;">\</span>
+  |clang -x c - -S -emit-llvm -o greet.ll
+</pre>
+</div>
+</li>
+
+<li>See the behavior of the original.  The <code>-l</code> flag to <code>llvm-mutate</code>
+causes it to link the resulting IR into an executable.
+
+<div class="org-src-container">
+
+<pre class="src src-sh">cat greet.ll|./llvm-mutate -l
+./a.out
+</pre>
+</div>
+</li>
+
+<li>Count the instruction ids in the original program.  The count is
+printed to STDERR so that the IR printed to STDOUT may be used by
+another program or directed to a file.
+
+<div class="org-src-container">
+
+<pre class="src src-sh">cat greet.ll|./llvm-mutate -I &gt; /dev/null 2&gt;&amp;1
+</pre>
+</div>
+</li>
+
+<li>Cut the first instruction from this program, compile and run.
+
+<div class="org-src-container">
+
+<pre class="src src-sh">cat greet.ll|./llvm-mutate -c 1 -l
+./a.out
+</pre>
+</div>
+
+<pre class="example">
+goodbye
+</pre>
+</li>
+
+<li>Insert the second instruction before the first.
+
+<div class="org-src-container">
+
+<pre class="src src-sh">cat greet.ll|./llvm-mutate -i 1,2 -l
+</pre>
+</div>
+</li>
+</ol>
+
+
+<div class="org-src-container">
+
+<pre class="src src-sh">./a.out
+</pre>
+</div>
+
+<pre class="example">
+goodbye
+hello
+goodbye
+</pre>
+
+<p>
+Swap the first two instructions.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">cat greet.ll|./llvm-mutate -s 1,2 -l
+./a.out
+</pre>
+</div>
+
+<pre class="example">
+goodbye
+hello
+</pre>
+</div>
+</div>
+<div id="outline-container-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Data Flow Instructions</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+We can also look at a slightly more complicated file which actually
+has some data dependencies between instructions.  Dependencies which
+the mutation tool will need to address.
+</p>
+
+<ol class="org-ol">
+<li>First we build a simple arithmetic program which passes the
+variable <code>x</code> between a number of instructions.
+<div class="org-src-container">
+
+<pre class="src src-sh">make arith.ll
+cat arith.ll|./llvm-mutate -l
+./a.out
+</pre>
+</div>
+
+<pre class="example">
+make: `arith.ll' is up to date.
+25
+</pre>
+</li>
+
+<li>Here mutations will change the data dependencies between the
+instructions.
+
+<div class="org-src-container">
+
+<pre class="src src-sh">cat arith.ll|./llvm-mutate -c 4 -l
+./a.out
+</pre>
+</div>
+
+<pre class="example">
+4
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">cat arith.ll|./llvm-mutate -c 3 -l
+./a.out
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">cat arith.ll|./llvm-mutate -c 6 -l
+./a.out
+</pre>
+</div>
+
+<pre class="example">
+10
+</pre>
+</li>
+
+<li>LLVM Mutate attempts to plug new instructions into the operands of
+inserted instructions, satisfying their arguments with in-scope
+variables and plugging their output into the arguments of
+subsequent variables.
+
+<div class="org-src-container">
+
+<pre class="src src-sh">cat arith.ll|./llvm-mutate -i 6,9 -l
+./a.out
+</pre>
+</div>
+
+<p>
+When this isn't possible, a warning is printed and the insertion
+likely has no effect.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">cat arith.ll|./llvm-mutate -i 4,10 -l 2&gt;&amp;1
+./a.out
+</pre>
+</div>
+
+<pre class="example">
+could find no use for result
+inserted 10 before 4
+25
+</pre>
+
+<p>
+Unless the results of the inserted instruction are not used.  For
+example this copies the printf instruction into the middle of the
+function.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">cat arith.ll|./llvm-mutate -i 4,11 -l
+./a.out
+</pre>
+</div>
+</li>
+
+<li>See the output of <code>llvm-mutate &#x2013;help</code> <sup><a id="fnr.4.100" name="fnr.4.100" class="footref" href="#fn.4">4</a></sup> for more actions
+which may be performed on compiled llvm IR.  If multiple options
+are given to llvm-mutate they will be applied in series to the
+code.  So for example the following command line
+<pre class="example">
+cat arith.ll|./llvm-mutate -I -g -G -c 3 -I -i 4,10 -I -G -l
+</pre>
+<p>
+will,
+</p>
+
+<ol class="org-ol">
+<li>print a count of instruction ids,
+</li>
+<li>generate the program control flow graph
+(shown on screen if dot and feh are installed),
+</li>
+<li>generate the program call graph
+</li>
+<li>cut an instruction,
+</li>
+<li>print another id count,
+</li>
+<li>inserts an instruction,
+</li>
+<li>prints a third instruction id count,
+</li>
+<li>display the new call graph
+</li>
+<li>and finally link the resulting LLVM IR into an executable.
+</li>
+</ol>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div id="outline-container-license" class="outline-2">
+<h2 id="license"><a id="sec-4" name="sec-4"></a><span class="section-number-2">4</span> License</h2>
+<div class="outline-text-2" id="text-license">
+
+<p>
+Licensed under the GPLV3, see the <a href="COPYING">COPYING</a> file in this directory
+for more information.
+</p>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+<a href="http://llvm.org/docs/WritingAnLLVMPass.html">http://llvm.org/docs/WritingAnLLVMPass.html</a>
+</p></div>
+
+<div class="footdef"><sup><a id="fn.2" name="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara">
+gp fieldguide
+</p></div>
+
+<div class="footdef"><sup><a id="fn.3" name="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara">
+mutation testing link
+</p></div>
+
+<div class="footdef"><sup><a id="fn.4" name="fn.4" class="footnum" href="#fnr.4">4</a></sup> <p class="footpara">
+Help information for the <code>llvm-mutate</code> script.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">llvm-mutate --help
+</pre>
+</div>
+
+<pre class="example">
+llvm-mutate -[n|l|g|G] -[c|i|s instructions] -l -[o path]
+ mutate llvm IR
+
+Options
+ -I,--ids -------- print the number of instructions
+ -L,--list ------- list instructions with number and types
+ -n,--name ------- name each instruction w/number
+ -g,--cfg -------- graph the CFG
+ -G,--call-graph - graph the call graph
+ -c,--cut -------- cut the given instruction
+ -r,--replace ---- replace the first inst. with the second
+ -i,--insert ----- copy the second inst. before the first
+ -s,--swap ------- swap the given instructions
+ -l,--link ------- link the result into an executable
+ -o,--out -------- write output to specified file
+</pre></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="author">Author: Eric Schulte</p>
+<p class="date">Created: 2013-04-13 Sat 12:48</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.0-pre)</p>
+<p class="xhtml-validation"><a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a></p>
+</div>
+</body>
+</html>
