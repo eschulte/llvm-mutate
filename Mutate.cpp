@@ -75,9 +75,23 @@ Value *findInstanceOfType(Instruction *I, Type *T){
   // TODO: types which could be replaced with sane default
   //       - result of comparisons
   //       - nulls or zeros for number types
-
-  // Give up with a 0
-  return 0;
+  // pulled from getNullValue
+  switch (T->getTypeID()) {
+  case Type::IntegerTyID:
+  case Type::HalfTyID:
+  case Type::FloatTyID:
+  case Type::DoubleTyID:
+  case Type::X86_FP80TyID:
+  case Type::FP128TyID:
+  case Type::PPC_FP128TyID:
+  case Type::PointerTyID:
+  case Type::StructTyID:
+  case Type::ArrayTyID:
+  case Type::VectorTyID:
+    return Constant::getNullValue(T);
+  default:
+    return 0;
+  }
 }
 
 // Replace the operands of Instruction I with in-scope values of the
