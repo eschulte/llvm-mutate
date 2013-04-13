@@ -11,7 +11,9 @@ LIBRARYNAME = Mutate
 LOADABLE_MODULE = 1
 
 # Include the makefile implementation stuff
-include $(LEVEL)/Makefile.common
+ifneq ($(wildcard $(LEVEL)/Makefile.common),)
+	include $(LEVEL)/Makefile.common
+endif
 
 # Testing support
 OPT_FLAGS=-load ${LEVEL}/Debug+Asserts/lib/Mutate.so
