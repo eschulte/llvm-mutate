@@ -114,10 +114,8 @@ void replaceOperands(Instruction *I){
 
         if(!isInScope){
           // If we've made it this far we really do have to find a replacement
-          Value *val = findInstanceOfType(I, v->getType());
-          if(val != 0){
-            errs() << "replacing argument: " << v << "\n";
-            I->setOperand(counter, val); } } } } }
+          errs() << "replacing argument: " << v << "\n";
+          I->setOperand(counter, findInstanceOfType(I, v->getType())); } } } }
 }
 
 namespace {
@@ -231,10 +229,7 @@ namespace {
           // TODO: once more thinking it would be good to glue basic
           //       blocks when we delete a terminating instruction
           Instruction *Inst = &*I;
-          if(!I->use_empty()){
-            Value *Val = findInstanceOfType(Inst,I->getType());
-            if(Val != 0){
-              I->replaceAllUsesWith(Val); } }
+          I->replaceAllUsesWith(findInstanceOfType(Inst,I->getType()));
           I->eraseFromParent();
           changed_p = true;
           return true; } }
