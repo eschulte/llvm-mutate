@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>llvm-mutate &#x2013; mutate LLVM IR</title>
-<!-- 2013-04-13 Sat 12:48 -->
+<!-- 2013-04-13 Sat 12:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="Eric Schulte"/>
@@ -152,40 +152,69 @@ for the JavaScript code in this tag.
 <h2 id="introduction"><a id="sec-1" name="sec-1"></a><span class="section-number-2">1</span> Introduction</h2>
 <div class="outline-text-2" id="text-introduction">
 <p>
-LLVM Mutate is an LLVM compilers pass <sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>.  Like all compiler
+LLVM Mutate is an LLVM compilers pass <small>[<a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a>]</small>.  Like all compiler
 passes, it manipulates LLVM intermediate representation (IR), but
 unlike most compiler passes it explicitly does <b>not</b> preserve
 semantics.  Instead it provides a number of simple mutation operations
 which may be specified through command line flags.  These operations
-are more similar to genetic programming <sup><a id="fnr.2" name="fnr.2" class="footref" href="#fn.2">2</a></sup> or mutation
-testing <sup><a id="fnr.3" name="fnr.3" class="footref" href="#fn.3">3</a></sup> operations than they are to traditional compiler
+are more similar to genetic programming <small>[<a id="fnr.2" name="fnr.2" class="footref" href="#fn.2">2</a>]</small> or mutation
+testing <small>[<a id="fnr.3" name="fnr.3" class="footref" href="#fn.3">3</a>]</small> operations than they are to traditional compiler
 transformations.
 </p>
 
 <p>
 Mutation Operations
 </p>
-<dl class="org-dl">
-<dt> ids </dt><dd>prints the total number of instructions
-</dd>
-<dt> list </dt><dd>lists each instruction with its type and its assigned id
-</dd>
-<dt> name </dt><dd>names each instruction (using LLVM's <a href="http://llvm.org/docs/doxygen/html/classllvm_1_1Value.html#a35ee267850af7c235474a8c46c7ac5af">Value.setName</a>)
-</dd>
-<dt> cut </dt><dd>removes the numbered instruction from the program
-</dd>
-<dt> insert </dt><dd>copies the second numbered instruction before the first
-</dd>
-<dt> replace </dt><dd>replace the first numbered instruction with the second
-</dd>
-<dt> swap </dt><dd>swaps the two numbered instructions
-</dd>
-</dl>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides" >
+
+
+<colgroup>
+<col class="left"/>
+
+<col class="left"/>
+</colgroup>
+<tbody>
+<tr>
+<td class="left">ids</td>
+<td class="left">prints the total number of instructions</td>
+</tr>
+
+<tr>
+<td class="left">list</td>
+<td class="left">lists each instruction with its type and its assigned id</td>
+</tr>
+
+<tr>
+<td class="left">name</td>
+<td class="left">names each instruction (using LLVM's <a href="http://llvm.org/docs/doxygen/html/classllvm_1_1Value.html#a35ee267850af7c235474a8c46c7ac5af">Value.setName</a>)</td>
+</tr>
+
+<tr>
+<td class="left">cut</td>
+<td class="left">removes the numbered instruction from the program</td>
+</tr>
+
+<tr>
+<td class="left">insert</td>
+<td class="left">copies the second numbered instruction before the first</td>
+</tr>
+
+<tr>
+<td class="left">replace</td>
+<td class="left">replace the first numbered instruction with the second</td>
+</tr>
+
+<tr>
+<td class="left">swap</td>
+<td class="left">swaps the two numbered instructions</td>
+</tr>
+</tbody>
+</table>
 
 <p>
 The <code>llvm-mutate</code> shell script wraps this compiler pass in a simple
 interface which facilitates program manipulation.  See the <a href="#examples">examples</a>
-and the help output <sup><a id="fnr.4" name="fnr.4" class="footref" href="#fn.4">4</a></sup>
+and the help output <small>[<a id="fnr.4" name="fnr.4" class="footref" href="#fn.4">4</a>]</small>
 </p>
 
 <p>
@@ -214,7 +243,7 @@ removed instructions, and to (2) fully incorporate added instructions.
 your LLVM source tree,
 </li>
 
-<li>Run <code>make</code> from within the Mutate directory.  See <sup><a id="fnr.1.100" name="fnr.1.100" class="footref" href="#fn.1">1</a></sup> for more
+<li>Run <code>make</code> from within the Mutate directory.  See <small>[<a id="fnr.1.100" name="fnr.1.100" class="footref" href="#fn.1">1</a>]</small> for more
 information on building LLVM compiler passes.
 </li>
 
@@ -231,236 +260,167 @@ environment variable should not be necessary).
 <div id="outline-container-examples" class="outline-2">
 <h2 id="examples"><a id="sec-3" name="sec-3"></a><span class="section-number-2">3</span> Examples</h2>
 <div class="outline-text-2" id="text-examples">
-</div>
 
-<div id="outline-container-3-1" class="outline-3">
-<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Simple side-effect instructions</h3>
-<div class="outline-text-3" id="text-3-1">
-<ol class="org-ol">
-<li>First compile a source file to LLVM assembly.
+<p>Examples</p>
 
-<div class="org-src-container">
+<p>First compile a source file to LLVM assembly.</p>
 
-<pre class="src src-sh"><span style="color: #ad7fa8;">echo</span> <span style="color: #e9b96e;">'main(){ puts("hello"); puts("goodbye");}'</span> <span style="color: #e9b96e;">\</span>
-  |clang -x c - -S -emit-llvm -o greet.ll
-</pre>
-</div>
-</li>
+<pre><code> $ echo 'main(){ puts("hello"); puts("goodbye");}' \
+     |clang -x c - -S -emit-llvm -o greet.ll
+</code></pre>
 
-<li>See the behavior of the original.  The <code>-l</code> flag to <code>llvm-mutate</code>
-causes it to link the resulting IR into an executable.
+<p>See the behavior of the original.</p>
 
-<div class="org-src-container">
+<pre><code> $ cat greet.ll|./llvm-mutate -l
 
-<pre class="src src-sh">cat greet.ll|./llvm-mutate -l
-./a.out
-</pre>
-</div>
-</li>
+ $ ./a.out
+ hello
+ goodbye
+</code></pre>
 
-<li>Count the instruction ids in the original program.  The count is
-printed to STDERR so that the IR printed to STDOUT may be used by
-another program or directed to a file.
+<p>Count the instruction ids in the original program.</p>
 
-<div class="org-src-container">
+<pre><code> $ cat greet.ll|./llvm-mutate -I -o /dev/null
+ 3
+</code></pre>
 
-<pre class="src src-sh">cat greet.ll|./llvm-mutate -I &gt; /dev/null 2&gt;&amp;1
-</pre>
-</div>
-</li>
+<p>Cut the first instruction from this program, compile and run.</p>
 
-<li>Cut the first instruction from this program, compile and run.
+<pre><code> $ cat greet.ll|./llvm-mutate -c 1 -l
+ cut 1
 
-<div class="org-src-container">
+ $ ./a.out
+ goodbye
+</code></pre>
 
-<pre class="src src-sh">cat greet.ll|./llvm-mutate -c 1 -l
-./a.out
-</pre>
-</div>
+<p>Insert the second instruction before the first.</p>
 
-<pre class="example">
-goodbye
-</pre>
-</li>
+<pre><code> $ cat greet.ll|./llvm-mutate -i 1,2 -l
+ inserted 2 before 1
 
-<li>Insert the second instruction before the first.
+ $ ./a.out
+ goodbye
+ hello
+ goodbye
+</code></pre>
 
-<div class="org-src-container">
+<p>Swap the first two instructions.</p>
 
-<pre class="src src-sh">cat greet.ll|./llvm-mutate -i 1,2 -l
-</pre>
-</div>
-</li>
-</ol>
+<pre><code> $ cat greet.ll|./llvm-mutate -s 1,2 -l
+ swapped 1 with 2
 
+ $ ./a.out
+ goodbye
+ hello
+</code></pre>
 
-<div class="org-src-container">
+<p>We can also look at a slightly more complicated file which actually
+   has some data dependencies between instructions.  Dependencies which
+   the mutation tool will need to address.</p>
 
-<pre class="src src-sh">./a.out
-</pre>
-</div>
+<pre><code> $ make arith.ll
 
-<pre class="example">
-goodbye
-hello
-goodbye
-</pre>
+ $ cat arith.ll|./llvm-mutate -l
 
-<p>
-Swap the first two instructions.
-</p>
+ $ ./a.out
+ 25
+</code></pre>
 
-<div class="org-src-container">
+<p>Here mutations will change the data dependencies between the
+   instructions, and effect the value of <code>x</code> which is printed at the
+   end.</p>
 
-<pre class="src src-sh">cat greet.ll|./llvm-mutate -s 1,2 -l
-./a.out
-</pre>
-</div>
+<pre><code> $ cat arith.ll|./llvm-mutate -c 4 -l
+ found local replacement: 0x2ac0aa8
+ cut 4
 
-<pre class="example">
-goodbye
-hello
-</pre>
-</div>
-</div>
-<div id="outline-container-3-2" class="outline-3">
-<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Data Flow Instructions</h3>
-<div class="outline-text-3" id="text-3-2">
-<p>
-We can also look at a slightly more complicated file which actually
-has some data dependencies between instructions.  Dependencies which
-the mutation tool will need to address.
-</p>
+ $ ./a.out
+ 4
 
-<ol class="org-ol">
-<li>First we build a simple arithmetic program which passes the
-variable <code>x</code> between a number of instructions.
-<div class="org-src-container">
+ $ cat arith.ll|./llvm-mutate -c 3 -l
+ cut 3
 
-<pre class="src src-sh">make arith.ll
-cat arith.ll|./llvm-mutate -l
-./a.out
-</pre>
-</div>
+ $ ./a.out
+ 9
 
-<pre class="example">
-make: `arith.ll' is up to date.
-25
-</pre>
-</li>
+ $ cat arith.ll|./llvm-mutate -c 6 -l
+ found local replacement: 0x39aaaa8
+ cut 6
 
-<li>Here mutations will change the data dependencies between the
-instructions.
+ $ ./a.out
+ 10
+</code></pre>
 
-<div class="org-src-container">
+<p>The compiler pass attempts to plug new instructions into the call
+   graph near where they are inserted, satisfying their arguments with
+   in-scope variables and plugging their output into the arguments of
+   subsequent variables.</p>
 
-<pre class="src src-sh">cat arith.ll|./llvm-mutate -c 4 -l
-./a.out
-</pre>
-</div>
+<pre><code> $ cat arith.ll|./llvm-mutate -i 6,9 -l
+ replacing argument: 0x2f6ce50
+ found local replacement: 0x2f6cae8
+ inserted 9 before 6
 
-<pre class="example">
-4
-</pre>
+ $ ./a.out
+ 4
+</code></pre>
 
-<div class="org-src-container">
+<p>When this isn't possible, a warning is printed and the insertion
+   likely has no effect.</p>
 
-<pre class="src src-sh">cat arith.ll|./llvm-mutate -c 3 -l
-./a.out
-</pre>
-</div>
+<pre><code> $ cat arith.ll|./llvm-mutate -i 4,10 -l
+ could find no use for result
+ inserted 10 before 4
 
-<div class="org-src-container">
+ $ ./a.out
+ 25
+</code></pre>
 
-<pre class="src src-sh">cat arith.ll|./llvm-mutate -c 6 -l
-./a.out
-</pre>
-</div>
+<p>Unless of course the inserted instruction acts through side effects.
+   For example this copies the printf instruction into the middle of
+   the function.</p>
 
-<pre class="example">
-10
-</pre>
-</li>
+<pre><code> $ cat arith.ll|./llvm-mutate -i 4,11 -l
+ replacing argument: 0x1e34f88
+ found local replacement: 0x1e34ae8
+ inserted 11 before 4
 
-<li>LLVM Mutate attempts to plug new instructions into the operands of
-inserted instructions, satisfying their arguments with in-scope
-variables and plugging their output into the arguments of
-subsequent variables.
+ $ ./a.out
+ 2
+ 25
+</code></pre>
 
-<div class="org-src-container">
+<p>See the output of <code>llvm-mutate --help</code> for more actions which may
+   be performed on compiled llvm IR.  If multiple options are given to
+   llvm-mutate they will be applied in series to the code.  So for
+   example the following command line will,</p>
 
-<pre class="src src-sh">cat arith.ll|./llvm-mutate -i 6,9 -l
-./a.out
-</pre>
-</div>
+<pre><code> $ cat arith.ll|./llvm-mutate -I -g -G -c 3 -I -i 4,10 -I -G -l
+ 12
+ cut 3
+ 11
+ replacing argument: 0x1d7df08
+ found local replacement: 0x1d7db80
+ inserted 10 before 4
+ 12
 
-<p>
-When this isn't possible, a warning is printed and the insertion
-likely has no effect.
-</p>
+ $ ./a.out 
+ 3
+ 9
+</code></pre>
 
-<div class="org-src-container">
-
-<pre class="src src-sh">cat arith.ll|./llvm-mutate -i 4,10 -l 2&gt;&amp;1
-./a.out
-</pre>
-</div>
-
-<pre class="example">
-could find no use for result
-inserted 10 before 4
-25
-</pre>
-
-<p>
-Unless the results of the inserted instruction are not used.  For
-example this copies the printf instruction into the middle of the
-function.
-</p>
-
-<div class="org-src-container">
-
-<pre class="src src-sh">cat arith.ll|./llvm-mutate -i 4,11 -l
-./a.out
-</pre>
-</div>
-</li>
-
-<li>See the output of <code>llvm-mutate &#x2013;help</code> <sup><a id="fnr.4.100" name="fnr.4.100" class="footref" href="#fn.4">4</a></sup> for more actions
-which may be performed on compiled llvm IR.  If multiple options
-are given to llvm-mutate they will be applied in series to the
-code.  So for example the following command line
-<pre class="example">
-cat arith.ll|./llvm-mutate -I -g -G -c 3 -I -i 4,10 -I -G -l
-</pre>
-<p>
-will,
-</p>
-
-<ol class="org-ol">
-<li>print a count of instruction ids,
-</li>
+<ol>
+<li>print a count of instruction ids,</li>
 <li>generate the program control flow graph
-(shown on screen if dot and feh are installed),
-</li>
-<li>generate the program call graph
-</li>
-<li>cut an instruction,
-</li>
-<li>print another id count,
-</li>
-<li>inserts an instruction,
-</li>
-<li>prints a third instruction id count,
-</li>
-<li>display the new call graph
-</li>
-<li>and finally link the resulting LLVM IR into an executable.
-</li>
+  (shown on screen if dot and feh are installed),</li>
+<li>generate the program call graph</li>
+<li>cut an instruction,</li>
+<li>print another id count,</li>
+<li>inserts an instruction,</li>
+<li>prints a third instruction id count,</li>
+<li>display the new call graph</li>
+<li>and finally link the resulting LLVM IR into an executable.</li>
 </ol>
-</li>
-</ol>
-</div>
 </div>
 </div>
 <div id="outline-container-license" class="outline-2">
@@ -477,19 +437,19 @@ for more information.
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+<div class="footdef"><small>[<a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a>]</small> <p class="footpara">
 <a href="http://llvm.org/docs/WritingAnLLVMPass.html">http://llvm.org/docs/WritingAnLLVMPass.html</a>
 </p></div>
 
-<div class="footdef"><sup><a id="fn.2" name="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara">
+<div class="footdef"><small>[<a id="fn.2" name="fn.2" class="footnum" href="#fnr.2">2</a>]</small> <p class="footpara">
 gp fieldguide
 </p></div>
 
-<div class="footdef"><sup><a id="fn.3" name="fn.3" class="footnum" href="#fnr.3">3</a></sup> <p class="footpara">
+<div class="footdef"><small>[<a id="fn.3" name="fn.3" class="footnum" href="#fnr.3">3</a>]</small> <p class="footpara">
 mutation testing link
 </p></div>
 
-<div class="footdef"><sup><a id="fn.4" name="fn.4" class="footnum" href="#fnr.4">4</a></sup> <p class="footpara">
+<div class="footdef"><small>[<a id="fn.4" name="fn.4" class="footnum" href="#fnr.4">4</a>]</small> <p class="footpara">
 Help information for the <code>llvm-mutate</code> script.
 </p>
 <div class="org-src-container">
@@ -521,7 +481,7 @@ Options
 </div></div>
 <div id="postamble" class="status">
 <p class="author">Author: Eric Schulte</p>
-<p class="date">Created: 2013-04-13 Sat 12:48</p>
+<p class="date">Created: 2013-04-13 Sat 12:58</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.0-pre)</p>
 <p class="xhtml-validation"><a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a></p>
 </div>
