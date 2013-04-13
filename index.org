@@ -34,11 +34,9 @@ To support application of these simple operations some surgery must be
 performed on the data dependency graph to both (1) replace the use of
 removed instructions, and to (2) fully incorporate added instructions.
 
-1. Removed instructions.
-   file:removed-instruction.png
-
-2. Added instruction.
-   file:added-instruction.png
+#+ATTR_HTML: border="0" rules="none" frame="none"
+| 1. Removed instruction.      | 2. Added instruction.      |
+| file:removed-instruction.png | file:added-instruction.png |
 
 * Instillation
   :PROPERTIES:

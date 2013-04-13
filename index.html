@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>llvm-mutate &#x2013; mutate LLVM IR</title>
-<!-- 2013-04-13 Sat 14:17 -->
+<!-- 2013-04-13 Sat 14:27 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="Eric Schulte"/>
@@ -223,15 +223,19 @@ performed on the data dependency graph to both (1) replace the use of
 removed instructions, and to (2) fully incorporate added instructions.
 </p>
 
-<ol class="org-ol">
-<li>Removed instructions.
-   <img src="removed-instruction.png"  alt="removed-instruction.png"/>
-</li>
+<table border="0" cellspacing="0" cellpadding="6" rules="groups">
+<tbody>
+<tr>
+<td class="center">1. Removed instruction.</td>
+<td class="center">2. Added instruction.</td>
+</tr>
 
-<li>Added instruction.
-   <img src="added-instruction.png"  alt="added-instruction.png"/>
-</li>
-</ol>
+<tr>
+<td class="left"><img src="removed-instruction.png"  alt="rem.png"/></td>
+<td class="left"><img src="added-instruction.png"  alt="added.png"/></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div id="outline-container-instillation" class="outline-2">
@@ -481,7 +485,7 @@ Options
 </div></div>
 <div id="postamble" class="status">
 <p class="author">Author: Eric Schulte</p>
-<p class="date">Created: 2013-04-13 Sat 14:17</p>
+<p class="date">Created: 2013-04-13 Sat 14:27</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.0-pre)</p>
 <p class="xhtml-validation"><a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a></p>
 </div>
