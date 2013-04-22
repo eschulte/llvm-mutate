@@ -43,7 +43,7 @@ removed instructions, and to (2) fully incorporate added instructions.
   :CUSTOM_ID: instillation
   :END:
 
-1. Copy or clone this repository to =llvm/lib/Transforms/Mutate= in
+1. Copy or clone this repository [fn:5] to =llvm/lib/Transforms/Mutate= in
    your LLVM source tree,
 
 2. Run =make= from within the Mutate directory.  See [fn:1] for more
@@ -105,3 +105,5 @@ for more information.
        :  -s,--swap ------- swap the given instructions
        :  -l,--link ------- link the result into an executable
        :  -o,--out -------- write output to specified file
+
+[fn:5] https://github.com/eschulte/llvm-mutate
