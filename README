@@ -5,6 +5,7 @@ This tool performs the following operations (among others)
       ids | prints the total number of instructions
      list | list instructions with their types and ids
      name | name each instruction by its id
+    trace | instrument to save an instruction execution trace
       cut | cuts the numbered instruction
    insert | copies the second numbered instruction before the first
   replace | replace inst1 with inst2
@@ -34,6 +35,17 @@ Examples
   Count the instruction ids in the original program.
 
     $ cat greet.ll|./llvm-mutate -I -o /dev/null
+    3
+
+  Compile a version which saves an instruction execution trace
+
+    $ cat greet.ll|llvm-mutate -t -l
+    $ ./a.out 
+    hello
+    goodbye
+    $ cat llvm_mutate_trace
+    1
+    2
     3
 
   Cut the first instruction from this program, compile and run.
