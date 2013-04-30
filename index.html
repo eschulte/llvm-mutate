@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>llvm-mutate &#x2013; mutate LLVM IR</title>
-<!-- 2013-04-22 Mon 17:08 -->
+<!-- 2013-04-30 Tue 07:13 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="Eric Schulte"/>
@@ -141,7 +141,7 @@ for the JavaScript code in this tag.
 <div id="text-table-of-contents">
 <ul>
 <li><a href="#introduction">1. Introduction</a></li>
-<li><a href="#instillation">2. Instillation</a></li>
+<li><a href="#instillation">2. Installation</a></li>
 <li><a href="#examples">3. Examples</a></li>
 <li><a href="#license">4. License</a></li>
 </ul>
@@ -190,6 +190,11 @@ Mutation Operations
 </tr>
 
 <tr>
+<td class="left">trace</td>
+<td class="left">instrument to trace all executed instructions</td>
+</tr>
+
+<tr>
 <td class="left">cut</td>
 <td class="left">removes the numbered instruction from the program</td>
 </tr>
@@ -223,23 +228,30 @@ performed on the data dependency graph to both (1) replace the use of
 removed instructions, and to (2) fully incorporate added instructions.
 </p>
 
-<table border="0" cellspacing="0" cellpadding="6" rules="groups">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col class="left"/>
+
+<col class="left"/>
+</colgroup>
 <tbody>
 <tr>
-<td class="center">1. Removed instruction.</td>
-<td class="center">2. Added instruction.</td>
+<td class="left">1. Removed instruction.</td>
+<td class="left">2. Added instruction.</td>
 </tr>
 
 <tr>
-<td class="left"><img src="removed-instruction.png"  alt="rem.png"/></td>
-<td class="left"><img src="added-instruction.png"  alt="added.png"/></td>
+<td class="left"><img src="removed-instruction.png"  alt="removed-instruction.png"/></td>
+<td class="left"><img src="added-instruction.png"  alt="added-instruction.png"/></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div id="outline-container-instillation" class="outline-2">
-<h2 id="instillation"><a id="sec-2" name="sec-2"></a><span class="section-number-2">2</span> Instillation</h2>
+<h2 id="instillation"><a id="sec-2" name="sec-2"></a><span class="section-number-2">2</span> Installation</h2>
 <div class="outline-text-2" id="text-instillation">
 
 <ol class="org-ol">
@@ -285,6 +297,18 @@ environment variable should not be necessary).
 <p>Count the instruction ids in the original program.</p>
 
 <pre><code> $ cat greet.ll|./llvm-mutate -I -o /dev/null
+ 3
+</code></pre>
+
+<p>Compile a version which saves an instruction execution trace</p>
+
+<pre><code> $ cat greet.ll|llvm-mutate -t -l
+ $ ./a.out 
+ hello
+ goodbye
+ $ cat llvm_mutate_trace
+ 1
+ 2
  3
 </code></pre>
 
@@ -489,7 +513,7 @@ Options
 </div></div>
 <div id="postamble" class="status">
 <p class="author">Author: Eric Schulte</p>
-<p class="date">Created: 2013-04-22 Mon 17:08</p>
+<p class="date">Created: 2013-04-30 Tue 07:13</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.0-pre)</p>
 <p class="xhtml-validation"><a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a></p>
 </div>
