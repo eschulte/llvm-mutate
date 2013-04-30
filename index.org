@@ -38,7 +38,7 @@ removed instructions, and to (2) fully incorporate added instructions.
 | 1. Removed instruction.      | 2. Added instruction.      |
 | file:removed-instruction.png | file:added-instruction.png |
 
-* Instillation
+* Installation
   :PROPERTIES:
   :CUSTOM_ID: instillation
   :END:
