@@ -34,6 +34,7 @@ if [ -z "$LLVM" ];then
     fi
 fi
 OPT_FLAGS="-load ${LLVM}/lib/Mutate.so -f"
+LINK_FLAGS=""
 LINK=""
 OUT=""
 RAW=$(cat -)
@@ -68,7 +69,7 @@ while [ $# -gt 0 ];do
         -n|--name)  run -name ;;
         -g|--cfg)   graph -dot-cfg ;;
         -G|--call-graph) graph -dot-callgraph ;;
-        -t|--trace) run -trace; shift;;
+        -t|--trace) LINK_FLAGS="$(dirname $0)/llvm_mutate_trace.o"; run -trace;;
         -c|--cut)   run -cut -inst1="$2"; shift;;
         -r|--replace)
             run -replace \
@@ -91,7 +92,7 @@ done
 
 if [ ! -z "$LINK" ];then
     if [ -z "$OUT" ];then OUT=a.out; fi
-    echo "$RAW"|llc|clang -x assembler - -o $OUT
+    echo "$RAW"|llc|clang $LINK_FLAGS -x assembler - -o $OUT
 else
     if [ -z "$OUT" ];then OUT=/dev/stdout; fi
     echo "$RAW" > $OUT
