@@ -55,8 +55,8 @@ graph(){
 
 ## Process Options
 eval set -- $(getopt \
-    -o ILngGc:r:i:s:lo:f: \
-    -l ids,tcfg,call-graph,list,name,trace,cut:,replace:,insert:,swap:,link,out:,file: \
+    -o ILntgGc:r:i:s:lo:f: \
+    -l ids,cfg,call-graph,list,name,trace,cut:,replace:,insert:,swap:,link,out:,file: \
     -- "$@" || echo "$HELP_TEXT" && exit 1;)
 while [ $# -gt 0 ];do
     case $1 in
