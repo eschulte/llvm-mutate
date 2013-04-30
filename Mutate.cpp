@@ -240,14 +240,15 @@ namespace {
 
     void walkFunction(Function *F){
       for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
-        count += 1;
-
-        // print instruction count
         Instruction *Inst = &*I;
-        // turn out integer into a constant integer value
-        Value *Args[1];
-        Args[0] = ConstantInt::get(Type::getInt32Ty(F->getContext()), count);
-        PutCall = CallInst::Create(PutFn, Args, "", Inst);
+        count += 1;
+        // to avoid: PHI nodes not grouped at top of basic block!
+        if(!isa<PHINode>(Inst)){
+          // turn the count into an argument array of constant integer values
+          Value *Args[1];
+          Args[0] = ConstantInt::get(Type::getInt32Ty(F->getContext()), count);
+          PutCall = CallInst::Create(PutFn, Args, "", Inst);
+        }
       }
     }
   };
