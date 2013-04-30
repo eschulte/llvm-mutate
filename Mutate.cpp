@@ -218,6 +218,42 @@ namespace {
 }
 
 namespace {
+  struct Trace : public ModulePass {
+    static char ID;
+    Trace() : ModulePass(ID) {}
+
+    bool runOnModule(Module &M){
+      count = 0;
+      PutFn = M.getOrInsertFunction("llvm_mutate_print_coverage",
+                                    Type::getVoidTy(M.getContext()),
+                                    Type::getInt32Ty(M.getContext()),
+                                    NULL);
+      for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
+        walkFunction(I);
+      return true;
+    }
+
+  private:
+    int unsigned count;
+    Constant *PutFn;
+    CallInst *PutCall;
+
+    void walkFunction(Function *F){
+      for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
+        count += 1;
+
+        // print instruction count
+        Instruction *Inst = &*I;
+        // turn out integer into a constant integer value
+        Value *Args[1];
+        Args[0] = ConstantInt::get(Type::getInt32Ty(F->getContext()), count);
+        PutCall = CallInst::Create(PutFn, Args, "tracer", Inst);
+      }
+    }
+  };
+}
+
+namespace {
   struct Cut : public ModulePass {
     static char ID;
     Cut() : ModulePass(ID) {}
@@ -421,13 +457,15 @@ namespace {
 char Ids::ID = 0;
 char List::ID = 0;
 char Name::ID = 0;
+char Trace::ID = 0;
 char Cut::ID = 0;
 char Insert::ID = 0;
 char Replace::ID = 0;
 char Swap::ID = 0;
-static RegisterPass<Ids>     T("ids",     "print the number of instructions");
-static RegisterPass<List>    U("list",    "list instruction's type and id");
-static RegisterPass<Name>    V("name",    "name each instruction by its id");
+static RegisterPass<Ids>     S("ids",     "print the number of instructions");
+static RegisterPass<List>    T("list",    "list instruction's type and id");
+static RegisterPass<Name>    U("name",    "name each instruction by its id");
+static RegisterPass<Trace>   V("trace",   "instrument to print inst. trace");
 static RegisterPass<Cut>     W("cut",     "cut instruction number inst1");
 static RegisterPass<Insert>  X("insert",  "insert inst2 before inst1");
 static RegisterPass<Replace> Y("replace", "replace inst1 with inst2");
