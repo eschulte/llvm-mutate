@@ -1,5 +1,7 @@
 Debug+Asserts
 LLVMBuild.txt
+llvm_mutate_trace
 a.out
 *.ll
 *.bl
+*.o

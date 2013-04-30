@@ -19,6 +19,8 @@ endif
 OPT_FLAGS=-load ${LEVEL}/Debug+Asserts/lib/Mutate.so
 LLVMC=clang -x c - -S -emit-llvm
 
+all:: llvm_mutate_trace.o
+
 greet.ll:
 	echo 'main(){ puts("hello"); puts("goodbye"); }'|$(LLVMC) -o $@
 

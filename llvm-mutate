@@ -9,6 +9,7 @@
 #  -n,--name ------- name each instruction w/number
 #  -g,--cfg -------- graph the CFG
 #  -G,--call-graph - graph the call graph
+#  -t,--trace ------ instrument to trace instructions
 #  -c,--cut -------- cut the given instruction
 #  -r,--replace ---- replace the first inst. with the second
 #  -i,--insert ----- copy the second inst. before the first
@@ -33,6 +34,7 @@ if [ -z "$LLVM" ];then
     fi
 fi
 OPT_FLAGS="-load ${LLVM}/lib/Mutate.so -f"
+LINK_FLAGS=""
 LINK=""
 OUT=""
 RAW=$(cat -)
@@ -54,8 +56,8 @@ graph(){
 
 ## Process Options
 eval set -- $(getopt \
-    -o ILngGc:r:i:s:lo:f: \
-    -l ids,cfg,call-graph,list,name,cut:,replace:,insert:,swap:,link,out:,file: \
+    -o ILntgGc:r:i:s:lo:f: \
+    -l ids,cfg,call-graph,list,name,trace,cut:,replace:,insert:,swap:,link,out:,file: \
     -- "$@" || echo "$HELP_TEXT" && exit 1;)
 while [ $# -gt 0 ];do
     case $1 in
@@ -67,6 +69,7 @@ while [ $# -gt 0 ];do
         -n|--name)  run -name ;;
         -g|--cfg)   graph -dot-cfg ;;
         -G|--call-graph) graph -dot-callgraph ;;
+        -t|--trace) LINK_FLAGS="$(dirname $0)/llvm_mutate_trace.o"; run -trace;;
         -c|--cut)   run -cut -inst1="$2"; shift;;
         -r|--replace)
             run -replace \
@@ -89,7 +92,7 @@ done
 
 if [ ! -z "$LINK" ];then
     if [ -z "$OUT" ];then OUT=a.out; fi
-    echo "$RAW"|llc|clang -x assembler - -o $OUT
+    echo "$RAW"|llc|clang $LINK_FLAGS -x assembler - -o $OUT
 else
     if [ -z "$OUT" ];then OUT=/dev/stdout; fi
     echo "$RAW" > $OUT
