@@ -9,6 +9,7 @@
 #  -n,--name ------- name each instruction w/number
 #  -g,--cfg -------- graph the CFG
 #  -G,--call-graph - graph the call graph
+#  -t,--trace ------ instrument to trace instructions
 #  -c,--cut -------- cut the given instruction
 #  -r,--replace ---- replace the first inst. with the second
 #  -i,--insert ----- copy the second inst. before the first
@@ -55,7 +56,7 @@ graph(){
 ## Process Options
 eval set -- $(getopt \
     -o ILngGc:r:i:s:lo:f: \
-    -l ids,cfg,call-graph,list,name,cut:,replace:,insert:,swap:,link,out:,file: \
+    -l ids,tcfg,call-graph,list,name,trace,cut:,replace:,insert:,swap:,link,out:,file: \
     -- "$@" || echo "$HELP_TEXT" && exit 1;)
 while [ $# -gt 0 ];do
     case $1 in
@@ -67,6 +68,7 @@ while [ $# -gt 0 ];do
         -n|--name)  run -name ;;
         -g|--cfg)   graph -dot-cfg ;;
         -G|--call-graph) graph -dot-callgraph ;;
+        -t|--trace) run -trace; shift;;
         -c|--cut)   run -cut -inst1="$2"; shift;;
         -r|--replace)
             run -replace \

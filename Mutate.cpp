@@ -224,7 +224,7 @@ namespace {
 
     bool runOnModule(Module &M){
       count = 0;
-      PutFn = M.getOrInsertFunction("llvm_mutate_print_coverage",
+      PutFn = M.getOrInsertFunction("llvm_mutate_trace",
                                     Type::getVoidTy(M.getContext()),
                                     Type::getInt32Ty(M.getContext()),
                                     NULL);
@@ -247,7 +247,7 @@ namespace {
         // turn out integer into a constant integer value
         Value *Args[1];
         Args[0] = ConstantInt::get(Type::getInt32Ty(F->getContext()), count);
-        PutCall = CallInst::Create(PutFn, Args, "tracer", Inst);
+        PutCall = CallInst::Create(PutFn, Args, "", Inst);
       }
     }
   };
