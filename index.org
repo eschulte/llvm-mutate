@@ -21,6 +21,7 @@ Mutation Operations
 | ids     | prints the total number of instructions                  |
 | list    | lists each instruction with its type and its assigned id |
 | name    | names each instruction (using LLVM's [[http://llvm.org/docs/doxygen/html/classllvm_1_1Value.html#a35ee267850af7c235474a8c46c7ac5af][Value.setName]])      |
+| trace   | instrument to trace all executed instructions            |
 | cut     | removes the numbered instruction from the program        |
 | insert  | copies the second numbered instruction before the first  |
 | replace | replace the first numbered instruction with the second   |
