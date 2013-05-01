@@ -72,7 +72,7 @@ actually *not* in scope.
 ** Reference
 - file:../../../docs/ProgrammersManual.html
 
-* Tasks [3/5]
+* Tasks [3/6]
 ** TODO cut correctly handle deletion of final instruction in block
 do this by folding it into its successor
 : /// FoldBlockIntoPredecessor - Folds a basic block into its predecessor if it
@@ -177,6 +177,7 @@ readily available type if we can't find one we like.
 Ideally subsequent uses of %cmp should be replaced with a default
 value like a false comparison.
 
+** TODO maybe look at mutating basic blocks as well as single instructions
 ** remove the use of stdio
 There must be a native llvm way to construct these names.
 (see the sprintf usage in Name).
