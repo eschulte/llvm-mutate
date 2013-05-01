@@ -30,5 +30,5 @@ arith.ll:
 branch.ll:
 	echo 'main(int c,char**v){if(atoi(v[1])==1){puts("1");}}'|$(LLVMC) -o $@
 
-real-clean: clean
-	@ rm -f a.out *.ll *.bl
+clean::
+	rm -f a.out *.ll *.bl *.o
