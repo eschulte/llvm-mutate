@@ -8,7 +8,7 @@
   :PROPERTIES:
   :CUSTOM_ID: introduction
   :END:
-LLVM Mutate is an LLVM compilers pass [fn:1].  Like all compiler
+LLVM Mutate is an LLVM compilers pass [fn:1].  Like all LLVM compiler
 passes, it manipulates LLVM intermediate representation (IR), but
 unlike most compiler passes it explicitly does *not* preserve
 semantics.  Instead it provides a number of simple mutation operations
