@@ -72,7 +72,7 @@ actually *not* in scope.
 ** Reference
 - file:../../../docs/ProgrammersManual.html
 
-* Tasks [3/5]
+* Tasks [3/7]
 ** TODO cut correctly handle deletion of final instruction in block
 do this by folding it into its successor
 : /// FoldBlockIntoPredecessor - Folds a basic block into its predecessor if it
@@ -176,6 +176,25 @@ readily available type if we can't find one we like.
 
 Ideally subsequent uses of %cmp should be replaced with a default
 value like a false comparison.
+
+** TODO maybe look at mutating basic blocks as well as single instructions
+** TODO it might be nice to visualize data flow
+The following shell munging of LLVM IR has backwards arrows, and is
+incomplete, but still gets pretty close.
+
+#+begin_src sh
+  SED_CMD=''
+  SED_CMD+='s/ = / <- /;s/alloca/%alloca/;'
+  SED_CMD+='s/ [^%< ][^ ]*//g;'
+  SED_CMD+='s/[,()]//g;'
+  SED_CMD+='s/%alloca/alloca/g;'
+  SED_CMD+='s/%//g;s/$/;/;'
+  SED_CMD+='s/<-/->/;'
+  
+  echo "$RAW"|grep "^ \+%"|sed ''
+  
+  echo -e "digraph{\n $BODY\n}"|dot -Tpng|feh -
+#+end_src
 
 ** remove the use of stdio
 There must be a native llvm way to construct these names.
