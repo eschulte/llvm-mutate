@@ -36,8 +36,10 @@ performed on the data dependency graph to both (1) replace the use of
 removed instructions, and to (2) fully incorporate added instructions.
 
 #+ATTR_HTML: border="0" rules="none" frame="none"
-| 1. Removed instruction.      | 2. Added instruction.      |
-| file:removed-instruction.png | file:added-instruction.png |
+| 1. Removed instruction.         | 2. Added instruction.             |
+| file:arith-c-4.svg              | file:arith-i-9-4.svg              |
+| cat arith.ll \vert llvm-mutate -c 4 | cat arith.ll \vert llvm-mutate -i 9,4 |
+#+TBLFM: $1=cat arith.ll
 
 * Installation
   :PROPERTIES:

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>llvm-mutate &#x2013; mutate LLVM IR</title>
-<!-- 2013-05-01 Wed 19:48 -->
+<!-- 2013-05-03 Fri 15:52 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="generator" content="Org-mode"/>
 <meta name="author" content="Eric Schulte"/>
@@ -243,8 +243,13 @@ removed instructions, and to (2) fully incorporate added instructions.
 </tr>
 
 <tr>
-<td class="left"><img src="removed-instruction.png"  alt="removed-instruction.png"/></td>
-<td class="left"><img src="added-instruction.png"  alt="added-instruction.png"/></td>
+<td class="left"><img src="arith-c-4.svg"  alt="arith-c-4.svg"/></td>
+<td class="left"><img src="arith-i-9-4.svg"  alt="arith-i-9-4.svg"/></td>
+</tr>
+
+<tr>
+<td class="left">cat arith.ll &#124; llvm-mutate -c 4</td>
+<td class="left">cat arith.ll &#124; llvm-mutate -i 9,4</td>
 </tr>
 </tbody>
 </table>
@@ -513,7 +518,7 @@ Options
 </div></div>
 <div id="postamble" class="status">
 <p class="author">Author: Eric Schulte</p>
-<p class="date">Created: 2013-05-01 Wed 19:48</p>
+<p class="date">Created: 2013-05-03 Fri 15:52</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.0-pre)</p>
 <p class="xhtml-validation"><a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a></p>
 </div>
