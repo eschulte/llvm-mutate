@@ -72,7 +72,13 @@ actually *not* in scope.
 ** Reference
 - file:../../../docs/ProgrammersManual.html
 
-* Tasks [3/7]
+* Tasks [3/8]
+** TODO crossover
+Maybe this should be done at the basic block level.
+
+Would the compiler need to simultaneously walk one module for each
+parent?
+
 ** TODO cut correctly handle deletion of final instruction in block
 do this by folding it into its successor
 : /// FoldBlockIntoPredecessor - Folds a basic block into its predecessor if it
