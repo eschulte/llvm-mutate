@@ -13,9 +13,18 @@ This tool performs the following operations (among others)
 
 Installation
 
-  Copy this directory to llvm/lib/Transforms/Mutate in your llvm
-  source tree, then run make from within the Mutate directory.  See
-  http://llvm.org/docs/WritingAnLLVMPass.html for more information.
+  This tool is implemented as an LLVM compiler pass (see [1]).  It is
+  built using the LLVM cmake machinery [2], and requires that LLVM was
+  installed with cmake.  However, this does *not* require access to
+  the LLVM source tree.  Run the following to build and install
+  llvm-mutate, possible changing /usr/local/share/llvm/cmake to the
+  appropriate path on your system.
+
+    mkdir build
+    cd build
+    cmake -DLLVM_DIR=/usr/local/share/llvm/cmake ../
+    make
+    sudo make install
 
 Examples
 
@@ -79,7 +88,8 @@ Examples
   has some data dependencies between instructions.  Dependencies which
   the mutation tool will need to address.
 
-    $ make arith.ll
+    $ echo 'main(){ int x=2; x+=3; x=x*x; printf("%d\n", x);}' \
+      |clang -x c - -S -emit-llvm -o arith.ll
 
     $ cat arith.ll|./llvm-mutate -l
 
@@ -179,3 +189,9 @@ License
 
   Licensed under the GPLV3, see the COPYING file in this directory for
   more information.
+
+Footnotes
+
+[1]  http://llvm.org/docs/WritingAnLLVMPass.html
+
+[2]  http://llvm.org/docs/CMake.html#developing-llvm-pass-out-of-source

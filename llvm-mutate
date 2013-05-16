@@ -27,11 +27,7 @@ if echo "$1"|grep -q "\-h";then
     echo "$HELP_TEXT"; exit 0;
 fi
 if [ -z "$LLVM" ];then
-    if [ -d "Debug+Asserts" ];then # prob. in the source directory
-        LLVM="../../../Debug+Asserts"
-    else # use opt to find it
-        LLVM="$(dirname $(which opt))/.."
-    fi
+    LLVM="$(dirname $0)/.."
 fi
 OPT_FLAGS="-load ${LLVM}/lib/Mutate.so -f"
 LINK_FLAGS=""
