@@ -7,3 +7,4 @@
 **/*.bl
 **/*.o
 **/*.so
+install_manifest.txt

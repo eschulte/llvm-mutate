@@ -15,12 +15,14 @@ Installation
 
   This tool is implemented as an LLVM compiler pass (see [1]).  It is
   built using the LLVM cmake machinery [2], and requires that LLVM was
-  installed with cmake, but does *not* require access to the LLVM
-  source tree.  Run the following to build, possible changing
-  /usr/local/share/llvm/cmake to the appropriate path on your system.
+  installed with cmake.  However, this does *not* require access to
+  the LLVM source tree.  Run the following to build and install
+  llvm-mutate, possible changing /usr/local/share/llvm/cmake to the
+  appropriate path on your system.
 
     cmake -DLLVM_DIR=/usr/local/share/llvm/cmake .
     make
+    sudo make install
 
 Examples
 
