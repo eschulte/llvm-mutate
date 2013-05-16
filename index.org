@@ -43,21 +43,30 @@ removed instructions, and to (2) fully incorporate added instructions.
 
 * Installation
   :PROPERTIES:
-  :CUSTOM_ID: instillation
+  :CUSTOM_ID: installation
   :END:
 
-1. Copy or clone this repository [fn:5] to =llvm/lib/Transforms/Mutate= in
-   your LLVM source tree,
+This is now built using the LLVM =cmake= machinery.  LLVM must be
+installed on your system using =cmake= for the following build
+instructions to work.
 
-2. Run =make= from within the Mutate directory.  See [fn:1] for more
-   information on building LLVM compiler passes.
+1. Make a =build= directory in which to compile the required
+   =Mutate.so= library.
 
-3. Place the =llvm-mutate= script in your path.  It may be necessary
-   to set the =LLVM= environment variable to the base of your LLVM
-   install so that the =llvm-mutate= script can load the =Mutate.so=
-   shared library (Note: if you re-install LLVM after adding this
-   repository to the Transforms directory setting the =LLVM=
-   environment variable should not be necessary).
+   : mkdir build
+   : cd build
+
+2. Generate the necessary Makefiles with =cmake=.  If necessary
+   replace =/usr/local/share/llvm/cmake= with the appropriate path on
+   your system.
+   
+   : cmake -DLLVM_DIR=/usr/local/share/llvm/cmake ../
+
+3. Build the library and install the library and the =llvm-mutate=
+   shell script driver.
+
+   : make
+   : sudo make install
 
 * Examples
   :PROPERTIES:
