@@ -113,14 +113,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/eschulte/src/llvm-mutate/CMakeFiles /home/eschulte/src/llvm-mutate/CMakeFiles/progress.marks
-	$(MAKE) -f CMakeFiles/Makefile2 all
+	cd /home/eschulte/src/llvm-mutate && $(CMAKE_COMMAND) -E cmake_progress_start /home/eschulte/src/llvm-mutate/CMakeFiles /home/eschulte/src/llvm-mutate/Mutate/CMakeFiles/progress.marks
+	cd /home/eschulte/src/llvm-mutate && $(MAKE) -f CMakeFiles/Makefile2 Mutate/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/eschulte/src/llvm-mutate/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	$(MAKE) -f CMakeFiles/Makefile2 clean
+	cd /home/eschulte/src/llvm-mutate && $(MAKE) -f CMakeFiles/Makefile2 Mutate/clean
 .PHONY : clean
 
 # The main clean target
@@ -129,31 +129,56 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	$(MAKE) -f CMakeFiles/Makefile2 preinstall
+	cd /home/eschulte/src/llvm-mutate && $(MAKE) -f CMakeFiles/Makefile2 Mutate/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	$(MAKE) -f CMakeFiles/Makefile2 preinstall
+	cd /home/eschulte/src/llvm-mutate && $(MAKE) -f CMakeFiles/Makefile2 Mutate/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	$(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/eschulte/src/llvm-mutate && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
-#=============================================================================
-# Target rules for targets named Mutate
+# Convenience name for target.
+Mutate/CMakeFiles/Mutate.dir/rule:
+	cd /home/eschulte/src/llvm-mutate && $(MAKE) -f CMakeFiles/Makefile2 Mutate/CMakeFiles/Mutate.dir/rule
+.PHONY : Mutate/CMakeFiles/Mutate.dir/rule
 
-# Build rule for target.
-Mutate: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 Mutate
+# Convenience name for target.
+Mutate: Mutate/CMakeFiles/Mutate.dir/rule
 .PHONY : Mutate
 
 # fast build rule for target.
 Mutate/fast:
-	$(MAKE) -f Mutate/CMakeFiles/Mutate.dir/build.make Mutate/CMakeFiles/Mutate.dir/build
+	cd /home/eschulte/src/llvm-mutate && $(MAKE) -f Mutate/CMakeFiles/Mutate.dir/build.make Mutate/CMakeFiles/Mutate.dir/build
 .PHONY : Mutate/fast
+
+Mutate.o: Mutate.cpp.o
+.PHONY : Mutate.o
+
+# target to build an object file
+Mutate.cpp.o:
+	cd /home/eschulte/src/llvm-mutate && $(MAKE) -f Mutate/CMakeFiles/Mutate.dir/build.make Mutate/CMakeFiles/Mutate.dir/Mutate.cpp.o
+.PHONY : Mutate.cpp.o
+
+Mutate.i: Mutate.cpp.i
+.PHONY : Mutate.i
+
+# target to preprocess a source file
+Mutate.cpp.i:
+	cd /home/eschulte/src/llvm-mutate && $(MAKE) -f Mutate/CMakeFiles/Mutate.dir/build.make Mutate/CMakeFiles/Mutate.dir/Mutate.cpp.i
+.PHONY : Mutate.cpp.i
+
+Mutate.s: Mutate.cpp.s
+.PHONY : Mutate.s
+
+# target to generate assembly for a file
+Mutate.cpp.s:
+	cd /home/eschulte/src/llvm-mutate && $(MAKE) -f Mutate/CMakeFiles/Mutate.dir/build.make Mutate/CMakeFiles/Mutate.dir/Mutate.cpp.s
+.PHONY : Mutate.cpp.s
 
 # Help Target
 help:
@@ -161,13 +186,16 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... Mutate"
 	@echo "... edit_cache"
 	@echo "... install"
 	@echo "... install/local"
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... Mutate"
+	@echo "... Mutate.o"
+	@echo "... Mutate.i"
+	@echo "... Mutate.s"
 .PHONY : help
 
 
@@ -179,6 +207,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	$(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/eschulte/src/llvm-mutate && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
