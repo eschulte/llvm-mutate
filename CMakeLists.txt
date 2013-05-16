@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
+set(CMAKE_C_FLAGS "-fPIC")
+set(CMAKE_CXX_FLAGS "-fPIC -fno-rtti -Wno-c++11-extensions")
+
 find_package(LLVM)
 
 # Define add_llvm_* macro's.

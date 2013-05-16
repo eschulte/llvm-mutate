@@ -1,3 +1,4 @@
+**/Makefile
 **/CMakeFiles
 **/CMakeCache.txt
 **/cmake_install.cmake
@@ -7,4 +8,6 @@
 **/*.bl
 **/*.o
 **/*.so
+
 install_manifest.txt
+build

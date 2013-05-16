@@ -20,7 +20,9 @@ Installation
   llvm-mutate, possible changing /usr/local/share/llvm/cmake to the
   appropriate path on your system.
 
-    cmake -DLLVM_DIR=/usr/local/share/llvm/cmake .
+    mkdir build
+    cd build
+    cmake -DLLVM_DIR=/usr/local/share/llvm/cmake ../
     make
     sudo make install
 
@@ -86,7 +88,8 @@ Examples
   has some data dependencies between instructions.  Dependencies which
   the mutation tool will need to address.
 
-    $ make arith.ll
+    $ echo 'main(){ int x=2; x+=3; x=x*x; printf("%d\n", x);}' \
+      |clang -x c - -S -emit-llvm -o arith.ll
 
     $ cat arith.ll|./llvm-mutate -l
 
