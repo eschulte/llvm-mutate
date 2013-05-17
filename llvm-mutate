@@ -66,7 +66,7 @@ fi
 ## Process Options
 while [ $# -gt 0 ];do
     case $1 in
-        -h|--help) echo "$HELP_TEXT" && exit 1;;
+        -h|--help) echo "$HELP_TEXT" && exit 0;;
         -l|--link) LINK="yes";;
         -o|--out)  OUT="$2"; shift;;
         -f|--file) FILE="$2"; shift;;
