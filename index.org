@@ -60,7 +60,7 @@ instructions to work.
    replace =/usr/local/share/llvm/cmake= with the appropriate path on
    your system.
    
-   : cmake -DLLVM_DIR=/usr/local/share/llvm/cmake ../
+   : cmake -DCMAKE_MODULE_PATH=/usr/local/share/llvm/cmake ../
 
 3. Build the library and install the library and the =llvm-mutate=
    shell script driver.
