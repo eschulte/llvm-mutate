@@ -106,11 +106,13 @@ for more information.
        :  mutate llvm IR
        : 
        : Options
+       :  -h,--help ------- print this help output
        :  -I,--ids -------- print the number of instructions
        :  -L,--list ------- list instructions with number and types
        :  -n,--name ------- name each instruction w/number
        :  -g,--cfg -------- graph the CFG
        :  -G,--call-graph - graph the call graph
+       :  -t,--trace ------ instrument to trace instructions
        :  -c,--cut -------- cut the given instruction
        :  -r,--replace ---- replace the first inst. with the second
        :  -i,--insert ----- copy the second inst. before the first
