@@ -4,6 +4,7 @@
 #  mutate llvm IR
 #
 # Options
+#  -h,--help ------- print this help output
 #  -I,--ids -------- print the number of instructions
 #  -L,--list ------- list instructions with number and types
 #  -n,--name ------- name each instruction w/number
@@ -23,9 +24,6 @@ HELP_TEXT=$(cat "$0" \
     |tail -n +3 \
     |sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' \
     |cut -c3-)
-if echo "$1"|grep -q "\-h";then
-    echo "$HELP_TEXT"; exit 0;
-fi
 if [ -z "$LLVM" ];then
     LLVM="$(dirname $0)/.."
 fi
@@ -33,9 +31,11 @@ OPT_FLAGS="-load ${LLVM}/lib/Mutate.so -f"
 LINK_FLAGS=""
 LINK=""
 OUT=""
-RAW=$(cat -)
+FIRST=0
+RAW=""
 
-run(){ RAW="$(echo "$RAW"|opt ${OPT_FLAGS} $@|llvm-dis)"; }
+init(){ if [ $FIRST -eq 0 ];then FIRST=1; RAW=$(cat -);fi; }
+run(){ init; RAW="$(echo "$RAW"|opt ${OPT_FLAGS} $@|llvm-dis)"; }
 graph(){
     for graph in $(run $1 3>&1 >/dev/null 2>&3 \
         |sed "s/Writing '//;s/'...//");do
@@ -50,13 +50,23 @@ graph(){
         fi
     done; }
 
+getopt -T > /dev/null
+if [ $? -eq 4 ]; then
+    # GNU enhanced getopt is available
+    eval set -- $(getopt \
+        -o hILntgGc:r:i:s:lo:f: \
+        -l help,ids,cfg,call-graph,list,name,trace,cut:,replace:,insert:,swap:,link,out:,file: \
+        -- "$@" || echo "$HELP_TEXT" && exit 1;)
+else
+    # Original getopt is available
+    HELP_TEXT=$(echo "$HELP_TEXT"|sed 's/,-[^ ]* / ---/;s/\(........\)-*/\1/')
+    eval set -- $(getopt hILntgGc:r:i:s:lo:f: "$@" || echo "$HELP_TEXT" && exit 1;) 2>/dev/null
+fi
+
 ## Process Options
-eval set -- $(getopt \
-    -o ILntgGc:r:i:s:lo:f: \
-    -l ids,cfg,call-graph,list,name,trace,cut:,replace:,insert:,swap:,link,out:,file: \
-    -- "$@" || echo "$HELP_TEXT" && exit 1;)
 while [ $# -gt 0 ];do
     case $1 in
+        -h|--help) echo "$HELP_TEXT" && exit 1;;
         -l|--link) LINK="yes";;
         -o|--out)  OUT="$2"; shift;;
         -f|--file) FILE="$2"; shift;;
@@ -80,11 +90,13 @@ while [ $# -gt 0 ];do
                 -inst1="$(echo $2|cut -d, -f1)" \
                 -inst2="$(echo $2|cut -d, -f2)"; shift;;
         (--) shift; break;;
-        (-*) error "unrecognized option $1";;
+        (-*) echo "$HELP_TEXT" && exit 1;;
         (*)  break;;
     esac
     shift
 done
+
+init
 
 if [ ! -z "$LINK" ];then
     if [ -z "$OUT" ];then OUT=a.out; fi
