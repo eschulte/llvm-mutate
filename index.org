@@ -48,7 +48,9 @@ removed instructions, and to (2) fully incorporate added instructions.
 
 This is now built using the LLVM =cmake= machinery.  LLVM must be
 installed on your system using =cmake= for the following build
-instructions to work.
+instructions to work.  The master branch of this repository should
+compile against the head of the LLVM svn repository, branch =llvm-3.2=
+should compile against LLVM version 3.2.
 
 1. Make a =build= directory in which to compile the required
    =Mutate.so= library.

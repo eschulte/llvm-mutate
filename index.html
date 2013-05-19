@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>llvm-mutate &#x2013; mutate LLVM IR</title>
-<!-- 2013-05-17 Fri 10:03 -->
+<!-- 2013-05-19 Sun 11:08 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 
@@ -263,7 +263,9 @@ removed instructions, and to (2) fully incorporate added instructions.
 <p>
 This is now built using the LLVM <code>cmake</code> machinery.  LLVM must be
 installed on your system using <code>cmake</code> for the following build
-instructions to work.
+instructions to work.  The master branch of this repository should
+compile against the head of the LLVM svn repository, branch <code>llvm-3.2</code>
+should compile against LLVM version 3.2.
 </p>
 
 <ol class="org-ol">
@@ -323,9 +325,19 @@ sudo make install
  3
 </code></pre>
 
-<p>Compile a version which saves an instruction execution trace</p>
+<p>Compile a version which saves an instruction execution trace.  First
+   this requires linking an object file defining a function with the
+   following name and type signature.</p>
 
-<pre><code> $ cat greet.ll|llvm-mutate -t -l
+<pre><code> void llvm_mutate_trace(int count);
+</code></pre>
+
+<p>An example is provided in llvm<em>mutate</em>trace.c.  This function will
+   be called once for each executed instruction and will be passed the
+   ID of the executed instruction as its argument.</p>
+
+<pre><code> $ gcc -c llvm_mutate_trace.c
+ $ cat greet.ll|llvm-mutate -t -l -T llvm_mutate_trace.o
  $ ./a.out 
  hello
  goodbye
@@ -522,6 +534,8 @@ Options
  -g,--cfg -------- graph the CFG
  -G,--call-graph - graph the call graph
  -t,--trace ------ instrument to trace instructions
+ -T,--trace-obj -- object file providing tracing function
+                   default is llvm_mutate_trace.o
  -c,--cut -------- cut the given instruction
  -r,--replace ---- replace the first inst. with the second
  -i,--insert ----- copy the second inst. before the first
@@ -535,7 +549,7 @@ Options
 </div></div>
 <div id="postamble" class="status">
 <p class="author">Author: Eric Schulte</p>
-<p class="date">Created: 2013-05-17 Fri 10:03</p>
+<p class="date">Created: 2013-05-19 Sun 11:08</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.0.2)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
