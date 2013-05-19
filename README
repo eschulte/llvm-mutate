@@ -18,7 +18,7 @@ Installation
   installed with cmake.  However, this does *not* require access to
   the LLVM source tree.
 
-  The HEAD of the LLVM svn repository (currently revision 182150) is
+  The HEAD of the LLVM svn repository (currently revision 182214) is
   known to work.  Branch llvm-3.2 of this repository compiles against
   LLVM version 3.2.
 
@@ -58,7 +58,7 @@ Examples
 
     void llvm_mutate_trace(int count);
 
-  An example is provided in llvm_mutate_trace.c.  This function will
+  An example is provided in `llvm_mutate_trace.c`.  This function will
   be called once for each executed instruction and will be passed the
   ID of the executed instruction as its argument.
 
