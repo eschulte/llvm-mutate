@@ -19,7 +19,8 @@ Installation
   the LLVM source tree.
 
   The HEAD of the LLVM svn repository (currently revision 182150) is
-  known to work.
+  known to work.  Branch llvm-3.2 of this repository compiles against
+  LLVM version 3.2.
 
   Run the following to build and install llvm-mutate, changing the
   llvm/cmake path /usr/local/share/llvm/cmake to the appropriate path
