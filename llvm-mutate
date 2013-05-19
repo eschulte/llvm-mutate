@@ -11,6 +11,8 @@
 #  -g,--cfg -------- graph the CFG
 #  -G,--call-graph - graph the call graph
 #  -t,--trace ------ instrument to trace instructions
+#  -T,--trace-obj -- object file providing tracing function
+#                    default is llvm_mutate_trace.o
 #  -c,--cut -------- cut the given instruction
 #  -r,--replace ---- replace the first inst. with the second
 #  -i,--insert ----- copy the second inst. before the first
@@ -28,6 +30,8 @@ if [ -z "$LLVM" ];then
     LLVM="$(dirname $0)/.."
 fi
 OPT_FLAGS="-load ${LLVM}/lib/Mutate.so -f"
+TRACE=""
+TRACE_OBJ="llvm_mutate_trace.o"
 LINK_FLAGS=""
 LINK=""
 OUT=""
@@ -54,13 +58,13 @@ getopt -T > /dev/null
 if [ $? -eq 4 ]; then
     # GNU enhanced getopt is available
     eval set -- $(getopt \
-        -o hILntgGc:r:i:s:lo:f: \
-        -l help,ids,cfg,call-graph,list,name,trace,cut:,replace:,insert:,swap:,link,out:,file: \
+        -o hILntT:gGc:r:i:s:lo:f: \
+        -l help,ids,cfg,call-graph,list,name,trace,trace-obj:,cut:,replace:,insert:,swap:,link,out:,file: \
         -- "$@" || echo "$HELP_TEXT" && exit 1;)
 else
     # Original getopt is available
     HELP_TEXT=$(echo "$HELP_TEXT"|sed 's/,-[^ ]* / ---/;s/\(........\)-*/\1/')
-    eval set -- $(getopt hILntgGc:r:i:s:lo:f: "$@" || echo "$HELP_TEXT" && exit 1;) 2>/dev/null
+    eval set -- $(getopt hILntT:gGc:r:i:s:lo:f: "$@" || echo "$HELP_TEXT" && exit 1;) 2>/dev/null
 fi
 
 ## Process Options
@@ -75,7 +79,8 @@ while [ $# -gt 0 ];do
         -n|--name)  run -name ;;
         -g|--cfg)   graph -dot-cfg ;;
         -G|--call-graph) graph -dot-callgraph ;;
-        -t|--trace) LINK_FLAGS="$(dirname $0)/llvm_mutate_trace.o"; run -trace;;
+        -t|--trace) TRACE="yes"; run -trace;;
+        -T|--trace-obj) TRACE_OBJ="$2"; shift;;
         -c|--cut)   run -cut -inst1="$2"; shift;;
         -r|--replace)
             run -replace \
@@ -100,6 +105,7 @@ init
 
 if [ ! -z "$LINK" ];then
     if [ -z "$OUT" ];then OUT=a.out; fi
+    if [ ! -z "$TRACE" ];then LINK_FLAGS+=" $TRACE_OBJ"; fi
     echo "$RAW"|llc|clang $LINK_FLAGS -x assembler - -o $OUT
 else
     if [ -z "$OUT" ];then OUT=/dev/stdout; fi

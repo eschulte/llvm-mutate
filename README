@@ -16,9 +16,15 @@ Installation
   This tool is implemented as an LLVM compiler pass (see [1]).  It is
   built using the LLVM cmake machinery [2], and requires that LLVM was
   installed with cmake.  However, this does *not* require access to
-  the LLVM source tree.  Run the following to build and install
-  llvm-mutate, possible changing /usr/local/share/llvm/cmake to the
-  appropriate path on your system.
+  the LLVM source tree.
+
+  The HEAD of the LLVM svn repository (currently revision 182150) is
+  known to work.  Branch llvm-3.2 of this repository compiles against
+  LLVM version 3.2.
+
+  Run the following to build and install llvm-mutate, changing the
+  llvm/cmake path /usr/local/share/llvm/cmake to the appropriate path
+  on your system.
 
     mkdir build
     cd build
@@ -46,9 +52,18 @@ Examples
     $ cat greet.ll|llvm-mutate -I -o /dev/null
     3
 
-  Compile a version which saves an instruction execution trace
+  Compile a version which saves an instruction execution trace.  First
+  this requires linking an object file defining a function with the
+  following name and type signature.
 
-    $ cat greet.ll|llvm-mutate -t -l
+    void llvm_mutate_trace(int count);
+
+  An example is provided in llvm_mutate_trace.c.  This function will
+  be called once for each executed instruction and will be passed the
+  ID of the executed instruction as its argument.
+
+    $ gcc -c llvm_mutate_trace.c
+    $ cat greet.ll|llvm-mutate -t -l -T llvm_mutate_trace.o
     $ ./a.out 
     hello
     goodbye
