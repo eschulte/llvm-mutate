@@ -1,8 +1,8 @@
 // Copyright (C) 2013 Eric Schulte
 #include <stdio.h>
 #include "llvm/Pass.h"
-#include "llvm/IR/Module.h"
-#include "llvm/IR/Instructions.h"
+#include "llvm/Module.h"
+#include "llvm/Instructions.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/InstIterator.h"
