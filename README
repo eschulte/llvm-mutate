@@ -52,9 +52,18 @@ Examples
     $ cat greet.ll|llvm-mutate -I -o /dev/null
     3
 
-  Compile a version which saves an instruction execution trace
+  Compile a version which saves an instruction execution trace.  First
+  this requires linking an object file defining a function with the
+  following name and type signature.
 
-    $ cat greet.ll|llvm-mutate -t -l
+    void llvm_mutate_trace(int count);
+
+  An example is provided in llvm_mutate_trace.c.  This function will
+  be called once for each executed instruction and will be passed the
+  ID of the executed instruction as its argument.
+
+    $ gcc -c llvm_mutate_trace.c
+    $ cat greet.ll|llvm-mutate -t -l -T llvm_mutate_trace.o
     $ ./a.out 
     hello
     goodbye
